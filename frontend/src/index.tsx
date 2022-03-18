@@ -1,4 +1,4 @@
-import "./assets/root.css";
+import "./assets/root.scss";
 
 import { lazy } from "solid-js";
 import { render } from 'solid-js/web';

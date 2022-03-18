@@ -1,8 +1,8 @@
-import "./assets/header.css";
+import "./assets/header.scss";
 import searchIcon from "./assets/searchIcon.svg";
 import { createSignal } from 'solid-js';
 
-export const SiteHeader = () => {
+export const SiteHeader = (props) => {
     const [focused, setFocused] = createSignal(false);
 
     const handleInputEvent = (event: InputEvent) => {
@@ -12,7 +12,7 @@ export const SiteHeader = () => {
         setFocused(strippedInputValue || inputFocused);
     }
 
-    return <header class={focused() ? "focused" : "unfocused"}>
+    return <header class={(focused() ? "focused" : "") + " " + (props.small ? "small" : "")}>
         <h1>Formelsamling<span id="dk">.dk</span></h1>
         <label class="search-container" for="search">
             <img src={searchIcon} />
