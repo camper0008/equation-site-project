@@ -7,8 +7,7 @@
 ```rs
 struct Equation {
     id: String // randomly generated
-    name: String,
-    description: String, // quick description for keywords
+    title: String,
     content: [EquationContent], // markdown
     date_created: String, // date created as ISO string
     creator: User,
@@ -19,8 +18,7 @@ struct Equation {
 // a shortened version of Equation to only provide necessary data to preview.
 struct PreviewableEquation {
     id: String // randomly generated
-    name: String,
-    description: String, // quick description for keywords
+    title: String,
     date_created: String, // date created as ISO string
 }
 ```
@@ -34,7 +32,6 @@ struct EquationContent {
 
 ```rs
 enum EquationContentType {
-    Title,
     Image,
     Text,
     Math,
@@ -46,7 +43,7 @@ enum EquationContentType {
 ```rs
 struct User {
     id: String, // randomly generated
-    name: String,
+    username: String,
     permission: Permission,
     posts: [Equation],
     date_created: String, // ISO string
@@ -125,8 +122,7 @@ struct Response {
 
 ```rs
 struct Request {
-    name: String,
-    description: String,
+    title: String,
     content: [EquationContent],
 }
 ```
@@ -161,6 +157,49 @@ struct Response {
 ```rs
 struct Param {
     post_id: String,
+}
+```
+
+#### Response
+
+* Status
+
+`200 OK | 400 Bad Request`
+
+* Body
+
+```rs
+struct Response {
+    ok: boolean,
+    msg: String, // success | unauthorized
+}
+```
+
+
+### POST `/equations/edit/:post_id:`
+
+#### Request
+
+**Requires a permission level of contributor or above**
+
+* Cookie
+
+`token: <auth token>`
+
+* Path Parameters
+
+```rs
+struct Param {
+    post_id: String,
+}
+```
+
+* Body
+
+```rs
+struct Request {
+    title: String,
+    content: [EquationContent],
 }
 ```
 
