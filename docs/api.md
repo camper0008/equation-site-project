@@ -6,10 +6,38 @@
 
 ```rs
 struct Equation {
+    id: String // randomly generated
     name: String,
-    content: String, // markdown
+    description: String, // quick description for keywords
+    content: [EquationContent], // markdown
     date_created: String, // date created as ISO string
     creator: User,
+}
+```
+
+```rs
+// a shortened version of Equation to only provide necessary data to preview.
+struct PreviewableEquation {
+    id: String // randomly generated
+    name: String,
+    description: String, // quick description for keywords
+    date_created: String, // date created as ISO string
+}
+```
+
+```rs
+struct EquationContent {
+    type: EquationContentType,
+    value: String,
+}
+```
+
+```rs
+enum EquationContentType {
+    Title,
+    Image,
+    Text,
+    Math,
 }
 ```
 
@@ -21,7 +49,7 @@ struct User {
     name: String,
     permission: Permission,
     posts: [Equation],
-    created: String,
+    date_created: String, // ISO string
 }
 ```
 
@@ -31,14 +59,14 @@ struct User {
 enum Permission {
     Unauthenticated,
     User,
-    Admin,
+    Contributor,
     Root,
 }
 ```
 
 ## api
 
-### POST `/user/login`
+### POST `/users/login`
 
 #### Request
 
@@ -59,9 +87,9 @@ struct Request {
 
 * Cookie
 
-`token: <auth token>
+`token: <auth token>`
 
-### POST `/user/logout`
+### POST `/users/logout`
 
 #### Request
 
@@ -75,11 +103,19 @@ struct Request {
 
 `200 OK | 400 Bad Request`
 
+
+```rs
+struct Response {
+    ok: boolean,
+    msg: String, // success | unauthorized
+}
+```
+
 ### POST `/equations/create`
 
 #### Request
 
-**Requires a permission level of admin or above**
+**Requires a permission level of contributor or above**
 
 * Cookie
 
@@ -90,7 +126,8 @@ struct Request {
 ```rs
 struct Request {
     name: String,
-    content: String,
+    description: String,
+    content: [EquationContent],
 }
 ```
 
@@ -98,5 +135,106 @@ struct Request {
 
 * Status
 
-`200 OK | 403 Forbidden`
+`200 OK | 400 Bad Request`
 
+* Body
+
+```rs
+struct Response {
+    ok: boolean,
+    msg: String, // success | unauthorized
+}
+```
+
+### POST `/equations/remove/:post_id:`
+
+#### Request
+
+**Requires a permission level of contributor or above**
+
+* Cookie
+
+`token: <auth token>`
+
+* Path Parameters
+
+```rs
+struct Param {
+    post_id: String,
+}
+```
+
+#### Response
+
+* Status
+
+`200 OK | 400 Bad Request`
+
+* Body
+
+```rs
+struct Response {
+    ok: boolean,
+    msg: String, // success | unauthorized
+}
+```
+
+### GET `/equations/one/:post_id:`
+
+#### Request
+
+* Path Parameters
+
+```rs
+struct Param {
+    post_id: String,
+}
+```
+
+#### Response
+
+* Status
+
+`200 OK`
+
+* Body
+
+```rs
+struct Response {
+    equation: Equation,
+}
+```
+
+### GET `/equations/all`
+
+#### Response
+
+```rs
+struct Response {
+    equations: [PreviewableEquation],
+}
+```
+
+### GET `/equations/search/:query`
+
+* Path Parameters
+
+```rs
+struct Param {
+    query: String,
+}
+```
+
+#### Response
+
+* Status
+
+`200 OK | 400 Bad Request`
+
+* Body
+
+```rs
+struct Response {
+    equations: [PreviewableEquation],
+}
+```
