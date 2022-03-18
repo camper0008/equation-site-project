@@ -1,0 +1,19 @@
+:root {
+    --clr-darkest: #171528;
+    --clr-dark: #2F2A51;
+    --clr-light: #B8D8D8;
+    --clr-brand: #665FAB;
+    --ff-body: sans-serif;
+    --ff-brand: "Fredoka", sans-serif;
+}
+
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    background-color: var(--clr-darkest);
+    font-family: var(--ff-body);
+    color: var(--clr-light);
+}

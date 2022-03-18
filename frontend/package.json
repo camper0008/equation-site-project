@@ -1,0 +1,23 @@
+{
+  "name": "equation-site-frontend",
+  "version": "0.1.0",
+  "private": true,
+  "devDependencies": {
+    "@types/node": "17.0.21",
+    "solid-js": "^1.3.13",
+    "solid-scripts": "0.0.61",
+    "typescript": "4.6.2"
+  },
+  "dependencies": {},
+  "scripts": {
+    "start": "solid-scripts start",
+    "build": "solid-scripts build"
+  },
+  "browserslist": [
+    "Chrome 74",
+    "Firefox 63",
+    "Safari 11",
+    "Edge 17",
+    "Node 10"
+  ]
+}
