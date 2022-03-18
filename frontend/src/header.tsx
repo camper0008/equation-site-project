@@ -13,7 +13,7 @@ export const SiteHeader = (props) => {
     }
 
     return <header class={(focused() ? "focused" : "") + " " + (props.small ? "small" : "")}>
-        <h1>Formelsamling<span id="dk">.dk</span></h1>
+        <h1>Formelsamling<span class="logo-tld">.dk</span></h1>
         <label class="search-container" for="search">
             <img src={searchIcon} />
             <input type="search" id="search" list="search-results" placeholder="Find formler..." onInput={handleInputEvent} onFocus={handleInputEvent} onBlur={handleInputEvent}/>
