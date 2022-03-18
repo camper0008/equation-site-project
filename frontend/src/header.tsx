@@ -1,5 +1,5 @@
-import "./header.css";
-import searchIcon from "./search.svg";
+import "./assets/header.css";
+import searchIcon from "./assets/searchIcon.svg";
 import { createSignal } from 'solid-js';
 
 export const SiteHeader = () => {

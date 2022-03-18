@@ -1,11 +1,9 @@
-import "./root.css";
-
+import "./assets/root.css";
 
 import { lazy } from "solid-js";
 import { render } from 'solid-js/web';
 import { SiteHeader } from "./header";
 import { Route, Router } from "./router";
-
 
 const Home = lazy(() => import("./home"));
 
