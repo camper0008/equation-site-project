@@ -25,7 +25,7 @@ struct PreviewableEquation {
 
 ```rs
 struct EquationContent {
-    type: EquationContentType,
+    content_type: EquationContentType,
     value: String,
 }
 ```
@@ -86,6 +86,16 @@ struct Request {
 
 `token: <auth token>`
 
+* Body
+
+```rs
+struct Response {
+    ok: boolean,
+    msg: String, // success | invalid login
+}
+```
+
+
 ### POST `/users/logout`
 
 #### Request
@@ -104,7 +114,7 @@ struct Request {
 ```rs
 struct Response {
     ok: boolean,
-    msg: String, // success | unauthorized
+    msg: String, // success | invalid cookie
 }
 ```
 
@@ -240,6 +250,8 @@ struct Param {
 
 ```rs
 struct Response {
+    ok: boolean,
+    msg: String, // success | invalid characters
     equation: Equation,
 }
 ```
@@ -250,6 +262,8 @@ struct Response {
 
 ```rs
 struct Response {
+    ok: boolean,
+    msg: String, // success | invalid characters
     equations: [PreviewableEquation],
 }
 ```
@@ -274,6 +288,8 @@ struct Param {
 
 ```rs
 struct Response {
+    ok: boolean,
+    msg: String, // success | invalid characters
     equations: [PreviewableEquation],
 }
 ```
