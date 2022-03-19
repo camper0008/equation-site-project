@@ -10,7 +10,8 @@
     "scripts": {
         "start": "node .",
         "build": "tsc",
-        "watch": "tsc -w"
+        "watch": "tsc -w",
+        "install": "tsc"
     },
     "devDependencies": {
         "@types/katex": "^0.11.1",
