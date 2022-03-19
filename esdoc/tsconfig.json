@@ -7,8 +7,9 @@
         // "incremental": true,
         // "tsBuildInfoFile": ".tsbuildinfo",
         // "extendedDiagnostics": true,
-        // "inlineSources": true,
-        // "inlineSourceMap": true,
+        "inlineSources": true,
+        "inlineSourceMap": true,
+        "declaration": true,
         "lib": [
             "ES2020"
         ],
