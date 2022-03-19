@@ -378,6 +378,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "equation-site-backend"
+version = "0.1.0"
+dependencies = [
+ "actix-web",
+]
+
+[[package]]
 name = "firestorm"
 version = "0.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -409,13 +416,6 @@ checksum = "5fc25a87fa4fd2094bffb06925852034d90a17f0d1e05197d4956d3555752191"
 dependencies = [
  "matches",
  "percent-encoding",
-]
-
-[[package]]
-name = "frommelsamling-backend"
-version = "0.1.0"
-dependencies = [
- "actix-web",
 ]
 
 [[package]]

@@ -8,7 +8,7 @@
 struct Equation {
     id: String // randomly generated
     title: String,
-    content: [EquationContent], // markdown
+    content: [EquationContent],
     date_created: String, // date created as ISO string
     creator: User,
 }
