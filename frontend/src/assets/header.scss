@@ -1,6 +1,18 @@
 header {
     padding-top: 8rem;
 
+    &.small {
+        padding-top: 2rem;
+
+        h1 {
+            font-size: 1.75em;
+        }
+
+        .search-container {
+            margin-top: 2rem;
+            font-size: 1.3em;
+        }
+    }
 
     h1 {
         text-align: center;

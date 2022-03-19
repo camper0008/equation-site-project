@@ -1,18 +1,16 @@
-import { createSignal, createContext, useContext } from "solid-js";
+import { createSignal, createContext, useContext, getOwner } from "solid-js";
 import { pathMatches } from "./utils";
 
-const RouterContext = createContext();
+export const RouterContext = createContext();
 
-export function Router(props) {
+export const Router = (props) => {
   const currentPage = window.location.pathname;
 
-  const [page, setPage] = createSignal(props.page || currentPage),
+  const [page, setPage] = createSignal(currentPage),
     store = [
       page,
       {
-        setPage(page) {
-          setPage(() => page);
-        },
+        goto(path) { setPage(path) },
       }
     ];
 
@@ -23,14 +21,16 @@ export function Router(props) {
   );
 }
 
-
 export const useRouter = () => useContext(RouterContext);
 
 export const Route = (props) => {
-    const [page, setPage] = useRouter();
+    const [page, {goto}] = useRouter();
 
     if (pathMatches(props.pattern, page()))
-        return props.children
+        return <>
+            {props.children}
+            <p>current page is: {page}</p>
+        </>
     else
         return <></>
 }
