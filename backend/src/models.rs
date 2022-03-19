@@ -6,6 +6,23 @@ pub struct User {
     date_created: String, // ISO string
 }
 
+pub struct DbUser {
+    id: String,
+    username: String,
+    permission: Permission,
+    posts: Vec<Equation>,
+    date_created: String, // ISO string
+    password: String,
+}
+
+pub struct DbEquation {
+    id: String, // randomly generated
+    title: String,
+    content: Vec<EquationContent>,
+    date_created: String, // date created as ISO string
+    creator: DbUser,
+}
+
 pub enum Permission {
     Unauthenticated,
     User,
