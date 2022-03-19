@@ -1,7 +1,8 @@
 use actix_web::{App, HttpServer};
 
+mod database;
+mod models;
 mod routes;
-mod web_models;
 
 use crate::routes::users;
 
