@@ -90,7 +90,7 @@ struct Request {
 
 ```rs
 struct Response {
-    ok: boolean,
+    ok: bool,
     msg: String, // success | invalid login
 }
 ```
@@ -113,7 +113,7 @@ struct Response {
 
 ```rs
 struct Response {
-    ok: boolean,
+    ok: bool,
     msg: String, // success | invalid cookie
 }
 ```
@@ -147,7 +147,7 @@ struct Request {
 
 ```rs
 struct Response {
-    ok: boolean,
+    ok: bool,
     msg: String, // success | unauthorized
 }
 ```
@@ -180,7 +180,7 @@ struct Param {
 
 ```rs
 struct Response {
-    ok: boolean,
+    ok: bool,
     msg: String, // success | unauthorized
 }
 ```
@@ -223,7 +223,7 @@ struct Request {
 
 ```rs
 struct Response {
-    ok: boolean,
+    ok: bool,
     msg: String, // success | unauthorized
 }
 ```
@@ -250,7 +250,7 @@ struct Param {
 
 ```rs
 struct Response {
-    ok: boolean,
+    ok: bool,
     msg: String, // success | invalid characters
     equation: Equation,
 }
@@ -262,7 +262,7 @@ struct Response {
 
 ```rs
 struct Response {
-    ok: boolean,
+    ok: bool,
     msg: String, // success | invalid characters
     equations: [PreviewableEquation],
 }
@@ -288,7 +288,7 @@ struct Param {
 
 ```rs
 struct Response {
-    ok: boolean,
+    ok: bool,
     msg: String, // success | invalid characters
     equations: [PreviewableEquation],
 }
