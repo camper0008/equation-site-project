@@ -251,35 +251,3 @@ export class EsParser {
     }
 }
 
-const main = async () => {
-    const json = new EsParser(`
-
-hello world
-
-title""bruh moment""
-
-test test
-test
-
-test
-
-math""x = \\frac{a}{b}""
-
-image""https://cdn.discordapp.com/attachments/937800018977488946/954271774063853588/unknown.png""
-
-code ""
-#include <stdio.h>
-
-int main()
-{
-    printf("hello world\\n");
-}
-""
-
-    `).parse().toJson();
-    const d = EsDocument.fromJson(json);
-    console.log(d.toHtml());
-}
-
-main();
-
