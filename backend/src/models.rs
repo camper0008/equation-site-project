@@ -1,28 +1,34 @@
+use serde::Serialize;
+
+#[derive(Serialize)]
 pub struct User {
-    id: String,
-    username: String,
-    permission: Permission,
-    posts: Vec<Equation>,
-    date_created: String, // ISO string
+    pub id: String,
+    pub username: String,
+    pub permission: Permission,
+    pub posts: Vec<Equation>,
+    pub date_created: String, // ISO string
 }
 
+#[derive(Serialize)]
 pub struct DbUser {
-    id: String,
-    username: String,
-    permission: Permission,
-    posts: Vec<Equation>,
-    date_created: String, // ISO string
-    password: String,
+    pub id: String,
+    pub username: String,
+    pub permission: Permission,
+    pub posts: Vec<Equation>,
+    pub date_created: String, // ISO string
+    pub password: String,
 }
 
+#[derive(Serialize)]
 pub struct DbEquation {
-    id: String, // randomly generated
-    title: String,
-    content: Vec<EquationContent>,
-    date_created: String, // date created as ISO string
-    creator: DbUser,
+    pub id: String, // randomly generated
+    pub title: String,
+    pub content: Vec<EquationContent>,
+    pub date_created: String, // date created as ISO string
+    pub creator: DbUser,
 }
 
+#[derive(Serialize)]
 pub enum Permission {
     Unauthenticated,
     User,
@@ -30,6 +36,7 @@ pub enum Permission {
     Root,
 }
 
+#[derive(Serialize)]
 pub struct Equation {
     id: String, // randomly generated
     title: String,
@@ -39,17 +46,20 @@ pub struct Equation {
 }
 
 // a shortened version of Equation to only provide necessary data to preview.
+#[derive(Serialize)]
 pub struct PreviewableEquation {
     id: String, // randomly generated
     title: String,
     date_created: String, // date created as ISO string
 }
 
+#[derive(Serialize)]
 pub struct EquationContent {
     content_type: EquationContentType,
     value: String,
 }
 
+#[derive(Serialize)]
 pub enum EquationContentType {
     Text,
     Image,

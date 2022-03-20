@@ -8,3 +8,6 @@ edition = "2021"
 [dependencies]
 actix-web = "4"
 serde = { version = "1.0", features = ["derive"] }
+mongodb = "2.0.0"
+bcrypt = "0.12"
+openssl = "0.10.38"
