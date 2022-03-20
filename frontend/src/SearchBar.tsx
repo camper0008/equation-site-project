@@ -1,32 +1,39 @@
+import { Component, JSX, Setter } from "solid-js";
 import searchIcon from "./assets/searchIcon.svg";
+import { StateManager } from "./StateManager";
 import { pathMatches, urlParams } from "./utils";
 
-const isFocused = (event: InputEvent) => {
-    const inputFocused = event.target.matches(":focus");
+const isFocused = (target: HTMLInputElement) => {
+    const inputFocused = target.matches(":focus");
 
     return inputFocused;
 }
 
-export const SearchBar = (props) => {
-    const handleInputEvent = (event: InputEvent) => {
-        props.setFocused(isFocused(event));
+interface Props {
+    state: StateManager,
+    setFocused: Setter<boolean>,
+}
+
+export const SearchBar: Component<Props> = ({state, setFocused}) => {
+    const handleInputEvent: JSX.EventHandler<HTMLInputElement, FocusEvent | InputEvent> = (event) => {
+        setFocused(isFocused(event.target as HTMLInputElement));
     }
 
     const urlSearchValue = () => {
         const pattern = "/search/:query";
-        if (pathMatches(pattern, props.state.path())) {
-            const params = urlParams(pattern, props.state.path());
+        if (pathMatches(pattern, state.path())) {
+            const params = urlParams(pattern, state.path());
             
             return decodeURIComponent(params.query);
         }
         return "";
     }
     
-    const handleKeyDownEvent = (event: KeyboardEvent) => {
+    const handleKeyDownEvent: JSX.EventHandler<HTMLInputElement, KeyboardEvent> = (event) => {
         if (event.key === "Enter") {
-            const searchbarValue = event.target.value;
+            const searchbarValue = (event.target as HTMLInputElement).value;
             const encodedValue = encodeURIComponent(searchbarValue)
-            props.state.goto("/search/" + encodedValue);
+            state.goto("/search/" + encodedValue);
         }
     }
 

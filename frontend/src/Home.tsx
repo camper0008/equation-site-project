@@ -1,9 +1,15 @@
 import "solid-js";
+import { Component } from "solid-js";
 import { SiteHeader } from "./SiteHeader";
+import { StateManager } from "./StateManager";
 
-const Home = (props) => {
+interface Props {
+    state: StateManager
+}
+
+const Home: Component<Props> = ({state}) => {
     return (<>
-        <SiteHeader state={props.state} />
+        <SiteHeader state={state} />
     </>);
 }
 

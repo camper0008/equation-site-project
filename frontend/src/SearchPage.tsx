@@ -1,9 +1,15 @@
 import "solid-js";
+import { Component } from "solid-js";
 import { SiteHeader } from "./SiteHeader";
+import { StateManager } from "./StateManager";
 
-const SearchPage = (props) => {
+interface Props {
+    state: StateManager,
+}
+
+const SearchPage: Component<Props> = ({state}) => {
     return (<>
-        <SiteHeader small state={props.state} />
+        <SiteHeader small state={state} />
     </>);
 }
 

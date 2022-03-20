@@ -1,6 +1,6 @@
 import "./assets/root.scss";
 
-import { lazy, createSignal } from "solid-js";
+import { lazy, createSignal, Match, Switch } from "solid-js";
 import { render } from 'solid-js/web';
 import { SiteHeader } from "./SiteHeader";
 import { pathMatches } from "./utils";

@@ -1,6 +1,7 @@
 import "./assets/header.scss";
-import { createSignal, getOwner } from 'solid-js';
+import { Component, createSignal, getOwner } from 'solid-js';
 import { SearchBar } from "./SearchBar";
+import { StateManager } from "./StateManager";
 
 const autocompleteValues = (): string[] => {
     return [
@@ -17,20 +18,25 @@ const AutoCompleteList = () => {
     return <datalist id="autocomplete"> {values.map((v) => <option value={v}/>)} </datalist>
 }
 
-export const SiteHeader = (props) => {
+interface Props {
+    state: StateManager,
+    small?: boolean,
+}
+
+export const SiteHeader: Component<Props> = ({state, small}) => {
     const [focused, setFocused] = createSignal(false);
 
     const gotoIndex = () => {
-        props.state.goto("/");
+        state.goto("/");
     }
 
     return <header 
             class={
                 (focused() ? "focused " : "") +
-                (props.small ? "small" : "")}
+                (small ? "small" : "")}
         >
         <h1 onClick={gotoIndex}>Formelsamling<span class="logo-tld">.dk</span></h1>
-        <SearchBar state={props.state} setFocused={setFocused}/>
+        <SearchBar state={state} setFocused={setFocused}/>
         <AutoCompleteList />
     </header>
 }
