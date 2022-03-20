@@ -44,6 +44,8 @@ fn get_random_valid_string() -> Result<[u8; 64], ErrorStack> {
 pub async fn login(db: web::Data<Db>, request: web::Json<LoginRequest>) -> impl Responder {
     let result = db.get_user_from_name(request.username.clone()).await;
 
+    // TODO: find a way to clean this match tree up
+
     match result {
         Ok(is_found) => match is_found {
             Some(user) => {
@@ -105,26 +107,4 @@ pub async fn login(db: web::Data<Db>, request: web::Json<LoginRequest>) -> impl 
                 msg: err.to_string(),
             }),
     }
-
-    /*
-    if request.username == "root" && request.password == "passwd" {
-        let cookie = Cookie::build("token", "auth").http_only(true).finish();
-        let res = LoginResponse {
-            ok: true,
-            msg: "success".into(),
-        };
-        Ok(HttpResponse::Ok()
-            .insert_header(ContentType::json())
-            .cookie(cookie)
-            .json(res))
-    } else {
-        let res = LoginResponse {
-            ok: false,
-            msg: "invalid login".into(),
-        };
-        Ok(HttpResponse::Ok()
-            .insert_header(ContentType::json())
-            .json(res))
-    }
-    */
 }
