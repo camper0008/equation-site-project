@@ -1,5 +1,5 @@
 export const urlParams = (pattern: string, path: string) => {
-    const params = {};
+    const params: {[key: string]: string} = {};
 
     const splitPattern = pattern.split("/");
     const splitPath = path.split("/");
