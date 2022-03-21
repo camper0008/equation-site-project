@@ -15,7 +15,6 @@ export const SiteHeader: Component<Props> = ({state}) => {
 
     return <nav class="main-nav">
         <a href="/" class="logo" onClick={(event) => anchorClickHandler(event, "/")}>Formelsamling<span class="logo-tld">.dk</span></a>
-        <a href="/login"         onClick={(event) => anchorClickHandler(event, "/login")}>login</a>
-        <a href="/register"      onClick={(event) => anchorClickHandler(event, "/register")}>opret ny bruger</a>
+        <a href="/login"         onClick={(event) => anchorClickHandler(event, "/login")}>Login</a>
     </nav>
 }

@@ -17,7 +17,7 @@ const capitalizeFirstLetter = (msg: string) => {
     return msg.slice(0,1).toUpperCase() + msg.slice(1);
 }
 
-const Register: Component<Props> = ({state}) => {
+const Login: Component<Props> = ({state}) => {
 
     const [fetching, setFetching] = createSignal(false);
 
@@ -26,16 +26,11 @@ const Register: Component<Props> = ({state}) => {
         password: "",
     } as fieldIssuesStore);
 
+    let usernameElement: HTMLInputElement;
+    let passwordElement: HTMLInputElement;
+
     const validateFields = (state: StateManager) => {
-        const issues: fieldIssuesStore = {
-            username: "",
-            password: "",
-        };
-    
-        const [username, password] = [
-            document.getElementById("username") as HTMLInputElement,
-            document.getElementById("password") as HTMLInputElement,
-        ];
+        const issues: fieldIssuesStore = { username: "", password: "" };
 
         if (username.value === "") {
             issues.username = "Felt må ikke være tomt"
@@ -54,14 +49,9 @@ const Register: Component<Props> = ({state}) => {
     const sendRequest = async (state: StateManager) => {
         setFetching(true);
 
-        const [username, password] = [
-            document.getElementById("username") as HTMLInputElement,
-            document.getElementById("password") as HTMLInputElement,
-        ];
-
         const body = JSON.stringify({
-            username: username.value,
-            password: password.value,
+            username: usernameElement.value,
+            password: passwordElement.value,
         });
 
         let res = await post(API_URL + "/users/create", body);
@@ -69,29 +59,42 @@ const Register: Component<Props> = ({state}) => {
         setFetching(false);
 
         if (!res.ok) {
-            setFieldIssues({
-                username: capitalizeFirstLetter(res.msg),
-                password: capitalizeFirstLetter(res.msg),
-            })
+            if (res.msg === "invalid username") {
+                setFieldIssues({
+                    username: capitalizeFirstLetter("Brugernavn allerede i brug"),
+                    password: "",
+                })
+            }
         } else {
-            state.goto("/");
+            state.goto("/login");
         }
+    }
+
+    const redirectToLogin = (event: Event) => {
+        event.preventDefault();
+        state.goto("/login");
     }
 
     return <>
         <Logo state={state} />
         <div class="form" aria-labelledby="form-title">
-        <h2 id="form-title">Opret Bruger</h2>
+        <h2 id="form-title">Opret bruger</h2>
+
             <p id="username-error" class="error">{fieldIssues().username}</p>
             <label for="username">Brugernavn</label>
-            <input {...{disabled: fetching() ? true : undefined}} id="username"/>
+            <input {...{disabled: fetching() ? true : undefined}} ref={usernameElement} id="username"/>
+            
             <p id="password-error" class="error">{fieldIssues().password}</p>
             <label for="password">Adgangskode</label>
-            <input {...{disabled: fetching() ? true : undefined}} type="password" id="password"/>
+            <input {...{disabled: fetching() ? true : undefined}} 
+            ref={passwordElement} type="password" id="password"
+            onKeyDown={ (event: KeyboardEvent) => { if (event.code === "Enter") validateFields(state); } }/>
+            
             <button {...{disabled: fetching() ? true : undefined}} 
             id="submit" onClick={() => {validateFields(state)}}>Indsend</button>
+            <p>Har du allerede en bruger? <a href="/login" onClick={redirectToLogin}>Login</a> i stedet.</p>
         </div>
     </>
 }
 
-export default Register;
+export default Login;

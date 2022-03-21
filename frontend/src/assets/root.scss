@@ -21,6 +21,10 @@ body {
     color: var(--clr-light);
 }
 
+a[href] {
+    color: var(--clr-brand)
+}
+
 :focus-visible {
     outline: 1px solid var(--clr-light);
     outline-offset: 0.4rem;

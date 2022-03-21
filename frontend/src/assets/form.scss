@@ -1,5 +1,6 @@
 .form {
     display: flex;
+    gap: 1rem;
     flex-direction: column;
 
     min-width: 300px;
@@ -10,24 +11,20 @@
     background-color: var(--clr-darker);
     border-radius: 0.325rem;
     margin: 3rem auto;
+    padding: 1.5rem;
 
     h2 {
         font-family: var(--ff-brand);
         text-align: center;
         margin: 0;
-        margin-top: 1rem;
-        padding: 1rem 0;
     }
 
     label {
         font-size: 1.2rem;
-        margin-left: 1rem;
-        margin-right: 1rem;
     }
 
     input, button {
         border: none;
-        margin: 1rem;
         padding: 0.5rem;
         border-radius: 0.325rem;
 
@@ -62,15 +59,21 @@
         }
     }
 
-    p.error {
-        margin: 0 1rem;
-        color: rgb(255, 25, 25);
-        font-weight: 900;
+    p {
+        margin: 0;
         font-size: 1.1em;
     }
 
-    *:last-child {
-        margin-bottom: 2rem;
+    p.error {
+        font-weight: 900;
+        color: rgb(255, 25, 25);
     }
-    
+
+    #submit {
+        margin: 1rem;
+    }
+
+    *:last-child {
+        margin-bottom: 1rem;
+    }
 }
