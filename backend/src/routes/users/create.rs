@@ -1,8 +1,8 @@
-use crate::database::db::Db;
+use crate::database::db::{Db, DbError};
 use crate::models::{GenericResponse, InsertableDbUser, Permission};
 use actix_web::{http::header::ContentType, post, web, HttpResponse, Responder};
 use bcrypt::{hash, DEFAULT_COST};
-use serde::{Deserialize, Serialize};
+use serde::Deserialize;
 use std::sync::Mutex;
 
 #[derive(Deserialize)]
@@ -59,10 +59,16 @@ pub async fn create(db: web::Data<Mutex<Db>>, req: web::Json<CreateRequest>) -> 
         password: hashed,
     };
 
-    HttpResponse::Ok()
-        .insert_header(ContentType::json())
-        .json(GenericResponse {
-            ok: true,
-            msg: "success".to_string(),
-        })
+    match (**db).lock().unwrap().add_user(user).await {
+        Ok(_) => HttpResponse::Ok()
+            .insert_header(ContentType::json())
+            .json(GenericResponse {
+                ok: true,
+                msg: "success".to_string(),
+            }),
+        Err(err) => match err {
+            DbError::Duplicate => bad_request_response("invalid username".to_string()),
+            _ => internal_server_error_response("db error".to_string()),
+        },
+    }
 }

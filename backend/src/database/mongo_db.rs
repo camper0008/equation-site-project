@@ -1,7 +1,6 @@
 use crate::database::db::DbError;
 use crate::models::{DbEquation, DbSession, DbUser, InsertableDbUser, SessionToken};
-use crate::utils::gen_random_valid_string;
-use chrono::prelude::{DateTime, Utc};
+use crate::utils::{gen_random_valid_string, utc_date_iso_string};
 use mongodb::{bson::doc, Client, Collection};
 
 #[derive(Clone)]
@@ -22,7 +21,7 @@ impl MongoDb {
         let collection: Collection<DbUser> =
             self.client.database(&self.db_name).collection("users");
         let duplicate_user_result = match collection
-            .find_one(doc! { "username": insertable_user.username.clone() }, None)
+            .find_one(doc! { "username": &insertable_user.username.clone() }, None)
             .await
         {
             Ok(Some(user)) => Ok(Some(user)),
@@ -30,26 +29,16 @@ impl MongoDb {
             Err(err) => Err(DbError::Custom(err.to_string())),
         };
 
-        if duplicate_user_result.is_err() {
-            return match duplicate_user_result {
-                Err(err) => Err(err),
-                Ok(_) => Ok(()),
-            };
-        };
-
-        let duplicate_user = duplicate_user_result.unwrap();
+        let duplicate_user = duplicate_user_result?;
         if duplicate_user.is_some() {
             return Err(DbError::Duplicate);
         };
 
-        let random_id_result = gen_random_valid_string();
-        if random_id_result.is_err() {
-            return Err(DbError::Custom("openssl error".to_string()));
+        let random_id_result = match gen_random_valid_string() {
+            Ok(random_id) => Ok(random_id),
+            Err(_) => Err(DbError::Custom("openssl error".to_string())),
         };
-
-        let random_id = random_id_result.unwrap();
-
-        let now: DateTime<Utc> = Utc::now();
+        let random_id = random_id_result?;
 
         let user = DbUser {
             id: random_id,
@@ -57,7 +46,7 @@ impl MongoDb {
             password: insertable_user.password,
             permission: insertable_user.permission,
             posts: vec![],
-            date_created: now.to_rfc3339(),
+            date_created: utc_date_iso_string(),
         };
 
         let result = collection.insert_one(user, None).await;

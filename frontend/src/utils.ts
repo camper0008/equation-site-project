@@ -22,8 +22,6 @@ export const pathMatches = (pattern: string, path: string) => {
     const splitPattern = pattern.split("/");
     const splitPath = path.split("/");
 
-    console.log(pattern, path);
-
     if (splitPath.length != splitPattern.length)
         return false;
 

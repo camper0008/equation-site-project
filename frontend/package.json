@@ -12,7 +12,8 @@
   "dependencies": {},
   "scripts": {
     "start": "solid-scripts start",
-    "build": "solid-scripts build"
+    "build": "solid-scripts build",
+    "check-types": "tsc --build --clean"
   },
   "browserslist": [
     "Chrome 74",

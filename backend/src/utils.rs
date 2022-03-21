@@ -1,4 +1,9 @@
+use chrono::prelude::Utc;
 use openssl::rand::rand_bytes;
+
+pub fn utc_date_iso_string() -> String {
+    Utc::now().to_rfc3339()
+}
 
 #[derive(Debug)]
 pub enum GenRandomError {

@@ -3,7 +3,6 @@ use crate::models::GenericResponse;
 use actix_web::{
     cookie::Cookie, http::header::ContentType, post, web, HttpRequest, HttpResponse, Responder,
 };
-use serde::Serialize;
 use std::sync::Mutex;
 
 fn internal_server_error_response(msg: String) -> HttpResponse {

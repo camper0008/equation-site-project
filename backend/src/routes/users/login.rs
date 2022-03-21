@@ -1,9 +1,13 @@
 use crate::database::db::Db;
 use crate::models::{DbSession, GenericResponse};
 use crate::utils::gen_random_valid_string;
-use actix_web::{cookie::Cookie, http::header::ContentType, post, web, HttpResponse, Responder};
+use actix_web::{
+    cookie::{time::Duration, Cookie, SameSite},
+    http::header::ContentType,
+    post, web, HttpResponse, Responder,
+};
 use bcrypt::verify;
-use serde::{Deserialize, Serialize};
+use serde::Deserialize;
 use std::sync::Mutex;
 
 #[derive(Deserialize)]
@@ -76,8 +80,11 @@ pub async fn login(db: web::Data<Mutex<Db>>, req: web::Json<LoginRequest>) -> im
     HttpResponse::Ok()
         .insert_header(ContentType::json())
         .cookie(
-            Cookie::build("token", random_token_string)
+            Cookie::build("SESSION_TOKEN", random_token_string)
                 .http_only(true)
+                .max_age(Duration::weeks(1))
+                .same_site(SameSite::Lax) // TODO: set to strict + add secure attribute
+                .path("/")
                 .finish(),
         )
         .json(GenericResponse {

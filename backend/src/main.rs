@@ -1,4 +1,5 @@
 use crate::database::mongo_db::MongoDb;
+use actix_cors::Cors;
 use actix_web::{web::Data, App, HttpServer};
 use std::sync::Mutex;
 
@@ -9,7 +10,7 @@ mod utils;
 
 use crate::routes::users;
 
-#[actix_web::main] // or #[tokio::main]
+#[actix_web::main]
 async fn main() -> std::io::Result<()> {
     let db = MongoDb::new(
         "mongodb://localhost:27017/".to_string(),
@@ -19,6 +20,8 @@ async fn main() -> std::io::Result<()> {
     HttpServer::new(move || {
         App::new()
             .app_data(Data::new(Mutex::new(db.clone())))
+            // TODO: set proper cors settings
+            .wrap(Cors::permissive())
             .service(users::login::login)
             .service(users::logout::logout)
             .service(users::create::create)
