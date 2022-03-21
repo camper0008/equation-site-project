@@ -2,7 +2,7 @@ import { Logo } from "../components/Logo";
 import { Component, createSignal } from "solid-js";
 import { StateManager } from "../StateManager";
 import "../assets/form.scss";
-import { API_URL } from "../api";
+import { API_URL, post } from "../api";
 
 interface Props {
     state: StateManager,
@@ -24,7 +24,7 @@ const Login: Component<Props> = ({state}) => {
     const [fieldIssues, setFieldIssues] = createSignal({
         username: "",
         password: "",
-    } as fieldIssuesStore)
+    } as fieldIssuesStore);
 
     const validateFields = (state: StateManager) => {
         const issues: fieldIssuesStore = {
@@ -64,12 +64,7 @@ const Login: Component<Props> = ({state}) => {
             password: password.value,
         });
 
-        let res = await (await fetch(API_URL + "/users/login", {
-            body,
-            method: "POST",
-            headers: new Headers({"Content-Type": "application/json"}),
-            credentials: "include" // TODO: remove if api and frontend is on same site
-        })).json();
+        let res = await post(API_URL + "/users/login", body);
 
         setFetching(false);
 

@@ -52,12 +52,6 @@
                 color: var(--clr-light);
                 opacity: 0.5;
             }
-
-            &:focus {
-                outline: 1px solid var(--clr-light);
-                outline-offset: 0.4rem;
-                border-radius: 0.325rem;
-            }
         }
 
         img {

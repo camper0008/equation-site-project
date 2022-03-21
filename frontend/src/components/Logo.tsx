@@ -8,10 +8,10 @@ interface Props {
 
 export const Logo: Component<Props> = ({state}) => {
 
-    const gotoIndex = () => {
+    const gotoIndex = (event) => {
+        event.preventDefault();
         state.goto("/");
     }
 
-    return <h1 class="logo" onClick={gotoIndex}>Formelsamling<span class="logo-tld">.dk</span></h1>
-
+    return <h1 class="logo"><a href="/" onClick={gotoIndex}>Formelsamling<span class="logo-tld">.dk</span></a></h1>
 }

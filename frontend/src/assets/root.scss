@@ -20,3 +20,9 @@ body {
     font-family: var(--ff-body);
     color: var(--clr-light);
 }
+
+:focus-visible {
+    outline: 1px solid var(--clr-light);
+    outline-offset: 0.4rem;
+    border-radius: 0.325rem;
+}

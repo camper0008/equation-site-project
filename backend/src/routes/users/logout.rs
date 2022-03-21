@@ -76,8 +76,12 @@ pub async fn logout(db: web::Data<Mutex<Db>>, req: HttpRequest) -> impl Responde
         );
     };
 
+    let mut removal_cookie = Cookie::build("SESSION_TOKEN", "").finish();
+    removal_cookie.make_removal();
+
     HttpResponse::Ok()
         .insert_header(ContentType::json())
+        .cookie(removal_cookie)
         .json(GenericResponse {
             ok: true,
             msg: "success".to_string(),
