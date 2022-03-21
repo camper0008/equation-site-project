@@ -1,0 +1,10 @@
+.logo {
+    padding-top: 2rem;
+    text-align: center;
+    font-family: var(--ff-brand);
+    cursor: pointer;
+
+    .logo-tld {
+        color: var(--clr-brand); 
+    }
+}

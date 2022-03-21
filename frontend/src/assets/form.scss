@@ -1,0 +1,76 @@
+.form {
+    display: flex;
+    flex-direction: column;
+
+    min-width: 300px;
+    width: 50%;
+    max-width: 500px;
+
+    box-shadow: var(--shadow);
+    background-color: var(--clr-darker);
+    border-radius: 0.325rem;
+    margin: 3rem auto;
+
+    h2 {
+        font-family: var(--ff-brand);
+        text-align: center;
+        margin: 0;
+        margin-top: 1rem;
+        padding: 1rem 0;
+    }
+
+    label {
+        font-size: 1.2rem;
+        margin-left: 1rem;
+        margin-right: 1rem;
+    }
+
+    input, button {
+        border: none;
+        margin: 1rem;
+        padding: 0.5rem;
+        border-radius: 0.325rem;
+
+        background-color: var(--clr-dark);
+        color: var(--clr-light);
+        font-size: 1.2rem;
+        font-family: var(--ff-body);
+
+        &[disabled] {
+            opacity: 0.5;
+            cursor: not-allowed;
+
+            &:hover, &:active {
+                opacity: 0.5;
+            }
+        }
+    }
+
+    button {
+        background-color: var(--clr-light);
+        color: var(--clr-dark);
+        cursor: pointer;
+        
+        transition: 100ms opacity;
+
+        &:hover {
+            opacity: 0.9;
+        }
+        
+        &:active {
+            opacity: 0.7;
+        }
+    }
+
+    p.error {
+        margin: 0 1rem;
+        color: rgb(255, 25, 25);
+        font-weight: 900;
+        font-size: 1.1em;
+    }
+
+    *:last-child {
+        margin-bottom: 2rem;
+    }
+    
+}
