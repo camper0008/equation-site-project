@@ -1,11 +1,13 @@
 use serde::Serialize;
 
+pub type SessionToken = String;
+
 #[derive(Serialize)]
 pub struct User {
     pub id: String,
     pub username: String,
     pub permission: Permission,
-    pub posts: Vec<Equation>,
+    pub posts: Vec<String>,   // post ids
     pub date_created: String, // ISO string
 }
 
@@ -14,7 +16,7 @@ pub struct DbUser {
     pub id: String,
     pub username: String,
     pub permission: Permission,
-    pub posts: Vec<Equation>,
+    pub posts: Vec<String>,   // post ids
     pub date_created: String, // ISO string
     pub password: String,
 }
@@ -25,7 +27,13 @@ pub struct DbEquation {
     pub title: String,
     pub content: Vec<EquationContent>,
     pub date_created: String, // date created as ISO string
-    pub creator: DbUser,
+    pub creator_id: String,
+}
+
+#[derive(Serialize)]
+pub struct DbSession {
+    pub token: SessionToken,
+    pub user_id: String,
 }
 
 #[derive(Serialize)]
@@ -41,13 +49,13 @@ pub struct Equation {
     title: String,
     content: Vec<EquationContent>,
     date_created: String, // date created as ISO string
-    creator: User,
+    creator_id: String,
 }
 
 // a shortened version of Equation to only provide necessary data to preview.
 #[derive(Serialize)]
 pub struct PreviewableEquation {
-    id: String, // randomly generated
+    id: String, // same as the full version of the equation
     title: String,
     date_created: String, // date created as ISO string
 }

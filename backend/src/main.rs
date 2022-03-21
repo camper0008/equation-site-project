@@ -1,5 +1,6 @@
 use crate::database::mongo_db::MongoDb;
 use actix_web::{web::Data, App, HttpServer};
+use std::sync::Mutex;
 
 mod database;
 mod models;
@@ -16,7 +17,7 @@ async fn main() -> std::io::Result<()> {
     .await;
     HttpServer::new(move || {
         App::new()
-            .app_data(Data::new(db.clone()))
+            .app_data(Data::new(Mutex::new(db.clone())))
             .service(users::login::login)
     })
     .bind(("127.0.0.1", 8080))?

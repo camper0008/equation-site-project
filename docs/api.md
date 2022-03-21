@@ -17,7 +17,7 @@ struct Equation {
 ```rs
 // a shortened version of Equation to only provide necessary data to preview.
 struct PreviewableEquation {
-    id: String // randomly generated
+    id: String // same id as the full equation
     title: String,
     date_created: String, // date created as ISO string
 }
@@ -45,7 +45,7 @@ struct User {
     id: String, // randomly generated
     username: String,
     permission: Permission,
-    posts: [Equation],
+    posts: [String], // equation ids
     date_created: String, // ISO string
 }
 ```
@@ -54,7 +54,6 @@ struct User {
 
 ```rs
 enum Permission {
-    Unauthenticated,
     User,
     Contributor,
     Root,

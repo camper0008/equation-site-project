@@ -1,5 +1,5 @@
 use crate::database::db_trait::DbError;
-use crate::models::{DbEquation, DbUser, Permission};
+use crate::models::{DbEquation, DbSession, DbUser, Permission, SessionToken};
 use mongodb::Client;
 
 #[derive(Clone)]
@@ -39,7 +39,7 @@ impl MongoDb {
         Ok(Some(DbUser {
             id: "".to_string(),
             username: "".to_string(),
-            permission: Permission::Unauthenticated,
+            permission: Permission::Root,
             posts: vec![],
             date_created: "".to_string(), // ISO string
             password: "".to_string(),
@@ -54,14 +54,24 @@ impl MongoDb {
             title: "".to_string(),
             content: vec![],
             date_created: "".to_string(), // date created as ISO string
-            creator: DbUser {
-                id: "".to_string(),
-                username: "".to_string(),
-                permission: Permission::Unauthenticated,
-                posts: vec![],
-                date_created: "".to_string(), // ISO string
-                password: "".to_string(),
-            },
+            creator_id: "root".to_string(),
+        }))
+    }
+    pub async fn add_session(&mut self, session: DbSession) -> Result<(), DbError> {
+        Ok(())
+    }
+    pub async fn get_session_user_from_token(
+        &mut self,
+        token: SessionToken,
+    ) -> Result<Option<DbUser>, DbError> {
+        Ok(Some(DbUser {
+            id: "root".to_string(),
+            username: "root".to_string(),
+            permission: Permission::Root,
+            posts: vec![],
+            date_created: "1970-01-01T00:00:00.000Z".to_string(), // ISO string
+            //password: "passwd".to_string(),
+            password: "$2y$12$/9ahkt3cP8aCoiXDQQiRleRfzuD6Xn6j5XtPZWfGpHGmsDDxLb/16".to_string(), // "passwd" encrypted with a cost of 12
         }))
     }
 }
