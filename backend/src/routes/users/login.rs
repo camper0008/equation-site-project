@@ -87,15 +87,16 @@ pub async fn login(db: web::Data<Mutex<Db>>, request: web::Json<LoginRequest>) -
         return bad_request_response("invalid login".to_string());
     };
 
-    let random_token_result = get_random_valid_bytes();
-    if random_token_result.is_err() {
+    let random_bytes_result = get_random_valid_bytes();
+    if random_bytes_result.is_err() {
         return internal_server_error_response("openssl error".to_string());
     };
 
-    let random_token_string = String::from_utf8_lossy(random_string_result.unwrap());
+    let random_token_bytes = random_bytes_result.unwrap();
+    let random_token_string = String::from_utf8_lossy(&random_token_bytes);
     let session = DbSession {
         user_id: user.id,
-        token: token.to_string(),
+        token: random_token_string.to_string(),
     };
 
     let db_result = (**db).lock().unwrap().add_session(session).await;
@@ -105,7 +106,11 @@ pub async fn login(db: web::Data<Mutex<Db>>, request: web::Json<LoginRequest>) -
 
     HttpResponse::Ok()
         .insert_header(ContentType::json())
-        .cookie(Cookie::build("token", token).http_only(true).finish())
+        .cookie(
+            Cookie::build("token", random_token_string)
+                .http_only(true)
+                .finish(),
+        )
         .json(LoginResponse {
             ok: true,
             msg: "success".to_string(),
