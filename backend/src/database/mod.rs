@@ -1,2 +1,2 @@
-pub mod db_trait;
+pub mod db;
 pub mod mongo_db;

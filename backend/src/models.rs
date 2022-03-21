@@ -21,6 +21,12 @@ pub struct DbUser {
     pub password: String,
 }
 
+pub struct InsertableDbUser {
+    pub username: String,
+    pub password: String,
+    pub permission: Permission,
+}
+
 #[derive(Serialize, Deserialize)]
 pub struct DbEquation {
     pub id: String, // randomly generated

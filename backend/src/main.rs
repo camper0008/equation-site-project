@@ -5,6 +5,7 @@ use std::sync::Mutex;
 mod database;
 mod models;
 mod routes;
+mod utils;
 
 use crate::routes::users;
 
@@ -20,6 +21,7 @@ async fn main() -> std::io::Result<()> {
             .app_data(Data::new(Mutex::new(db.clone())))
             .service(users::login::login)
             .service(users::logout::logout)
+            .service(users::create::create)
     })
     .bind(("127.0.0.1", 8080))?
     .run()

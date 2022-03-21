@@ -1,4 +1,4 @@
-use crate::database::db_trait::{Db, DbError};
+use crate::database::db::{Db, DbError};
 use actix_web::{
     cookie::Cookie, http::header::ContentType, post, web, HttpRequest, HttpResponse, Responder,
 };

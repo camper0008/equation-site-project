@@ -94,7 +94,6 @@ struct Response {
 }
 ```
 
-
 ### POST `/users/logout`
 
 #### Request
@@ -109,11 +108,38 @@ struct Response {
 
 `200 OK | 400 Bad Request`
 
-
 ```rs
 struct Response {
     ok: bool,
     msg: String, // success | invalid cookie
+}
+```
+
+### POST `/users/create`
+
+#### Request
+
+* Body
+
+```rs
+struct Request {
+    username: String,
+    password: String,
+}
+```
+
+#### Response
+
+* Status
+
+`200 OK | 400 Bad Request`
+
+* Body
+
+```rs
+struct Response {
+    ok: bool,
+    msg: String, // success | invalid username
 }
 ```
 
