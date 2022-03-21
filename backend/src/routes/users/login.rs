@@ -1,6 +1,6 @@
 use crate::database::db::Db;
 use crate::models::{GenericResponse, InsertableDbSession};
-use crate::utils::gen_random_valid_string;
+use crate::utils::{bad_request_response, gen_random_valid_string, internal_server_error_response};
 use actix_web::{
     cookie::{time::Duration, Cookie, SameSite},
     http::header::ContentType,
@@ -14,24 +14,6 @@ use std::sync::Mutex;
 pub struct LoginRequest {
     username: String,
     password: String,
-}
-
-fn internal_server_error_response(msg: String) -> HttpResponse {
-    HttpResponse::InternalServerError()
-        .insert_header(ContentType::json())
-        .json(GenericResponse {
-            ok: false,
-            msg: msg,
-        })
-}
-
-fn bad_request_response(msg: String) -> HttpResponse {
-    HttpResponse::BadRequest()
-        .insert_header(ContentType::json())
-        .json(GenericResponse {
-            ok: false,
-            msg: msg,
-        })
 }
 
 #[post("/users/login")]

@@ -1,3 +1,5 @@
+use crate::models::GenericResponse;
+use actix_web::{http::header::ContentType, HttpResponse};
 use chrono::prelude::Utc;
 use openssl::rand::rand_bytes;
 
@@ -50,4 +52,22 @@ pub fn gen_random_valid_string() -> Result<String, GenRandomError> {
         Ok(random_string) => Ok(random_string),
         Err(_) => Err(GenRandomError::ConversionError),
     }
+}
+
+pub fn internal_server_error_response(msg: String) -> HttpResponse {
+    HttpResponse::InternalServerError()
+        .insert_header(ContentType::json())
+        .json(GenericResponse {
+            ok: false,
+            msg: msg,
+        })
+}
+
+pub fn bad_request_response(msg: String) -> HttpResponse {
+    HttpResponse::BadRequest()
+        .insert_header(ContentType::json())
+        .json(GenericResponse {
+            ok: false,
+            msg: msg,
+        })
 }

@@ -1,27 +1,10 @@
 use crate::database::db::{Db, DbError};
 use crate::models::GenericResponse;
+use crate::utils::{bad_request_response, internal_server_error_response};
 use actix_web::{
     cookie::Cookie, http::header::ContentType, post, web, HttpRequest, HttpResponse, Responder,
 };
 use std::sync::Mutex;
-
-fn internal_server_error_response(msg: String) -> HttpResponse {
-    HttpResponse::InternalServerError()
-        .insert_header(ContentType::json())
-        .json(GenericResponse {
-            ok: false,
-            msg: msg,
-        })
-}
-
-fn bad_request_response(msg: String) -> HttpResponse {
-    HttpResponse::BadRequest()
-        .insert_header(ContentType::json())
-        .json(GenericResponse {
-            ok: false,
-            msg: msg,
-        })
-}
 
 #[post("/users/logout")]
 pub async fn logout(db: web::Data<Mutex<Db>>, req: HttpRequest) -> impl Responder {

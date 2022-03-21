@@ -1,5 +1,6 @@
 use crate::database::db::{Db, DbError};
 use crate::models::{GenericResponse, InsertableDbUser, Permission};
+use crate::utils::{bad_request_response, internal_server_error_response};
 use actix_web::{http::header::ContentType, post, web, HttpResponse, Responder};
 use bcrypt::{hash, DEFAULT_COST};
 use serde::Deserialize;
@@ -9,24 +10,6 @@ use std::sync::Mutex;
 pub struct CreateRequest {
     username: String,
     password: String,
-}
-
-fn internal_server_error_response(msg: String) -> HttpResponse {
-    HttpResponse::InternalServerError()
-        .insert_header(ContentType::json())
-        .json(GenericResponse {
-            ok: false,
-            msg: msg,
-        })
-}
-
-fn bad_request_response(msg: String) -> HttpResponse {
-    HttpResponse::BadRequest()
-        .insert_header(ContentType::json())
-        .json(GenericResponse {
-            ok: false,
-            msg: msg,
-        })
 }
 
 #[post("/users/create")]
