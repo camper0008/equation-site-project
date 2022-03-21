@@ -21,7 +21,7 @@ pub struct DbUser {
     pub password: String,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Deserialize)]
 pub struct DbEquation {
     pub id: String, // randomly generated
     pub title: String,
@@ -30,7 +30,7 @@ pub struct DbEquation {
     pub creator_id: String,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Deserialize)]
 pub struct DbSession {
     pub token: SessionToken,
     pub user_id: String,
@@ -53,20 +53,20 @@ pub struct Equation {
 }
 
 // a shortened version of Equation to only provide necessary data to preview.
-#[derive(Serialize)]
+#[derive(Serialize, Deserialize)]
 pub struct PreviewableEquation {
     id: String, // same as the full version of the equation
     title: String,
     date_created: String, // date created as ISO string
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Deserialize)]
 pub struct EquationContent {
     content_type: EquationContentType,
     value: String,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Deserialize)]
 pub enum EquationContentType {
     Text,
     Image,

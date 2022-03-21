@@ -1,5 +1,5 @@
 use crate::database::db_trait::DbError;
-use crate::models::{DbEquation, DbSession, DbUser, Permission, SessionToken};
+use crate::models::{DbEquation, DbSession, DbUser, SessionToken};
 use mongodb::{bson::doc, Client, Collection};
 
 #[derive(Clone)]
@@ -17,65 +17,113 @@ impl MongoDb {
         }
     }
     pub async fn add_user(&mut self, user: DbUser) -> Result<(), DbError> {
-        let collection = self.client.database(&self.db_name).collection("users");
+        let collection: Collection<DbUser> =
+            self.client.database(&self.db_name).collection("users");
         let result = collection.insert_one(user, None).await;
         match result {
             Ok(_) => Ok(()),
             Err(err) => Err(DbError::Custom(err.to_string())),
         }
     }
-    pub async fn get_user_from_name(&self, name: String) -> Result<Option<DbUser>, DbError> {
+    pub async fn get_user_from_name(&self, username: String) -> Result<Option<DbUser>, DbError> {
         let collection: Collection<DbUser> =
             self.client.database(&self.db_name).collection("users");
-        match collection.find_one(doc! { "username": name }, None).await {
+        match collection
+            .find_one(doc! { "username": username }, None)
+            .await
+        {
             Ok(Some(user)) => Ok(Some(user)),
             Ok(None) => Ok(None),
             Err(err) => Err(DbError::Custom(err.to_string())),
         }
     }
     pub async fn get_user_from_id(&self, id: String) -> Result<Option<DbUser>, DbError> {
-        Ok(Some(DbUser {
-            id: "".to_string(),
-            username: "".to_string(),
-            permission: Permission::Root,
-            posts: vec![],
-            date_created: "".to_string(), // ISO string
-            password: "".to_string(),
-        }))
+        let collection: Collection<DbUser> =
+            self.client.database(&self.db_name).collection("users");
+        match collection.find_one(doc! { "id": id }, None).await {
+            Ok(Some(user)) => Ok(Some(user)),
+            Ok(None) => Ok(None),
+            Err(err) => Err(DbError::Custom(err.to_string())),
+        }
     }
     pub async fn add_equation(&mut self, equation: DbEquation) -> Result<(), DbError> {
-        Ok(())
+        let collection: Collection<DbEquation> =
+            self.client.database(&self.db_name).collection("equations");
+        let result = collection.insert_one(equation, None).await;
+        match result {
+            Ok(_) => Ok(()),
+            Err(err) => Err(DbError::Custom(err.to_string())),
+        }
     }
     pub async fn get_equation_from_id(&self, id: String) -> Result<Option<DbEquation>, DbError> {
-        Ok(Some(DbEquation {
-            id: "".to_string(), // randomly generated
-            title: "".to_string(),
-            content: vec![],
-            date_created: "".to_string(), // date created as ISO string
-            creator_id: "root".to_string(),
-        }))
+        let collection: Collection<DbEquation> =
+            self.client.database(&self.db_name).collection("equations");
+        match collection.find_one(doc! { "id": id }, None).await {
+            Ok(Some(equation)) => Ok(Some(equation)),
+            Ok(None) => Ok(None),
+            Err(err) => Err(DbError::Custom(err.to_string())),
+        }
     }
     pub async fn add_session(&mut self, session: DbSession) -> Result<(), DbError> {
-        Ok(())
+        let collection: Collection<DbSession> =
+            self.client.database(&self.db_name).collection("sessions");
+        let result = collection.insert_one(session, None).await;
+        match result {
+            Ok(_) => Ok(()),
+            Err(err) => Err(DbError::Custom(err.to_string())),
+        }
     }
     pub async fn get_session_user_from_token(
         &mut self,
         token: SessionToken,
     ) -> Result<Option<DbUser>, DbError> {
-        Ok(Some(DbUser {
-            id: "root".to_string(),
-            username: "root".to_string(),
-            permission: Permission::Root,
-            posts: vec![],
-            date_created: "1970-01-01T00:00:00.000Z".to_string(), // ISO string
-            //password: "passwd".to_string(),
-            password: "$2y$12$/9ahkt3cP8aCoiXDQQiRleRfzuD6Xn6j5XtPZWfGpHGmsDDxLb/16".to_string(), // "passwd" encrypted with a cost of 12
-        }))
+        let session_collection: Collection<DbSession> =
+            self.client.database(&self.db_name).collection("sessions");
+        let session_result = match session_collection
+            .find_one(doc! { "token": token }, None)
+            .await
+        {
+            Ok(Some(session)) => Ok(Some(session)),
+            Ok(None) => Ok(None),
+            Err(err) => Err(DbError::Custom(err.to_string())),
+        };
+
+        if session_result.is_err() {
+            return match session_result {
+                Err(err) => Err(DbError::Custom(err.to_string())),
+                _ => Ok(None),
+            };
+        };
+
+        let session_or_none = session_result.unwrap();
+        if session_or_none.is_none() {
+            return Ok(None);
+        };
+
+        let session = session_or_none.unwrap();
+        let user_collection: Collection<DbUser> =
+            self.client.database(&self.db_name).collection("users");
+        let user_result = match user_collection
+            .find_one(doc! { "user_id": session.user_id }, None)
+            .await
+        {
+            Ok(Some(user)) => Ok(Some(user)),
+            Ok(None) => Ok(None),
+            Err(err) => Err(DbError::Custom(err.to_string())),
+        };
+
+        user_result
     }
     pub async fn delete_user_session(
         &mut self,
         token: SessionToken,
-    ) -> Result<Option<()>, DbError> {
-        Ok(Some(()))
+    ) -> Result<Option<DbSession>, DbError> {
+        let collection: Collection<DbSession> =
+            self.client.database(&self.db_name).collection("sessions");
+        match collection.find_one(doc! { "token": token }, None).await {
+            Ok(Some(session)) => Ok(Some(session)),
+            Ok(None) => Ok(None),
+            Err(err) => Err(DbError::Custom(err.to_string())),
+        }
     }
 }
