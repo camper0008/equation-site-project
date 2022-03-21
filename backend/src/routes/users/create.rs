@@ -1,5 +1,5 @@
 use crate::database::db::Db;
-use crate::models::{InsertableDbUser, Permission};
+use crate::models::{GenericResponse, InsertableDbUser, Permission};
 use actix_web::{http::header::ContentType, post, web, HttpResponse, Responder};
 use bcrypt::{hash, DEFAULT_COST};
 use serde::{Deserialize, Serialize};
@@ -11,16 +11,10 @@ pub struct CreateRequest {
     password: String,
 }
 
-#[derive(Serialize)]
-pub struct CreateResponse {
-    ok: bool,
-    msg: String,
-}
-
 fn internal_server_error_response(msg: String) -> HttpResponse {
     HttpResponse::InternalServerError()
         .insert_header(ContentType::json())
-        .json(CreateResponse {
+        .json(GenericResponse {
             ok: false,
             msg: msg,
         })
@@ -29,7 +23,7 @@ fn internal_server_error_response(msg: String) -> HttpResponse {
 fn bad_request_response(msg: String) -> HttpResponse {
     HttpResponse::BadRequest()
         .insert_header(ContentType::json())
-        .json(CreateResponse {
+        .json(GenericResponse {
             ok: false,
             msg: msg,
         })
@@ -67,7 +61,7 @@ pub async fn create(db: web::Data<Mutex<Db>>, req: web::Json<CreateRequest>) -> 
 
     HttpResponse::Ok()
         .insert_header(ContentType::json())
-        .json(CreateResponse {
+        .json(GenericResponse {
             ok: true,
             msg: "success".to_string(),
         })

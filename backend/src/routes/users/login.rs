@@ -1,5 +1,5 @@
 use crate::database::db::Db;
-use crate::models::DbSession;
+use crate::models::{DbSession, GenericResponse};
 use crate::utils::gen_random_valid_string;
 use actix_web::{cookie::Cookie, http::header::ContentType, post, web, HttpResponse, Responder};
 use bcrypt::verify;
@@ -12,16 +12,10 @@ pub struct LoginRequest {
     password: String,
 }
 
-#[derive(Serialize)]
-pub struct LoginResponse {
-    ok: bool,
-    msg: String,
-}
-
 fn internal_server_error_response(msg: String) -> HttpResponse {
     HttpResponse::InternalServerError()
         .insert_header(ContentType::json())
-        .json(LoginResponse {
+        .json(GenericResponse {
             ok: false,
             msg: msg,
         })
@@ -30,7 +24,7 @@ fn internal_server_error_response(msg: String) -> HttpResponse {
 fn bad_request_response(msg: String) -> HttpResponse {
     HttpResponse::BadRequest()
         .insert_header(ContentType::json())
-        .json(LoginResponse {
+        .json(GenericResponse {
             ok: false,
             msg: msg,
         })
@@ -86,7 +80,7 @@ pub async fn login(db: web::Data<Mutex<Db>>, req: web::Json<LoginRequest>) -> im
                 .http_only(true)
                 .finish(),
         )
-        .json(LoginResponse {
+        .json(GenericResponse {
             ok: true,
             msg: "success".to_string(),
         })

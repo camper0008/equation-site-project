@@ -1,20 +1,15 @@
 use crate::database::db::{Db, DbError};
+use crate::models::GenericResponse;
 use actix_web::{
     cookie::Cookie, http::header::ContentType, post, web, HttpRequest, HttpResponse, Responder,
 };
 use serde::Serialize;
 use std::sync::Mutex;
 
-#[derive(Serialize)]
-pub struct LogoutResponse {
-    ok: bool,
-    msg: String,
-}
-
 fn internal_server_error_response(msg: String) -> HttpResponse {
     HttpResponse::InternalServerError()
         .insert_header(ContentType::json())
-        .json(LogoutResponse {
+        .json(GenericResponse {
             ok: false,
             msg: msg,
         })
@@ -23,7 +18,7 @@ fn internal_server_error_response(msg: String) -> HttpResponse {
 fn bad_request_response(msg: String) -> HttpResponse {
     HttpResponse::BadRequest()
         .insert_header(ContentType::json())
-        .json(LogoutResponse {
+        .json(GenericResponse {
             ok: false,
             msg: msg,
         })
@@ -84,7 +79,7 @@ pub async fn logout(db: web::Data<Mutex<Db>>, req: HttpRequest) -> impl Responde
 
     HttpResponse::Ok()
         .insert_header(ContentType::json())
-        .json(LogoutResponse {
+        .json(GenericResponse {
             ok: true,
             msg: "success".to_string(),
         })

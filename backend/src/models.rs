@@ -3,6 +3,12 @@ use serde::{Deserialize, Serialize};
 pub type SessionToken = String;
 
 #[derive(Serialize)]
+pub struct GenericResponse {
+    pub msg: String,
+    pub ok: bool,
+}
+
+#[derive(Serialize)]
 pub struct User {
     pub id: String,
     pub username: String,
