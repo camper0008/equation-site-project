@@ -8,7 +8,7 @@ interface Props {
 
 export const Logo: Component<Props> = ({state}) => {
 
-    const gotoIndex = (event) => {
+    const gotoIndex = (event: Event) => {
         event.preventDefault();
         state.goto("/");
     }

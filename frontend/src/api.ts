@@ -1,6 +1,6 @@
 export const API_URL = "http://localhost:8080";
 
-interface body {}
+type body = BodyInit | null | undefined;
 
 export const post = async (url: string, body: body) => {
     return await (await fetch(url, {
