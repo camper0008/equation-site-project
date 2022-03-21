@@ -1,4 +1,4 @@
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
 pub type SessionToken = String;
 
@@ -11,7 +11,7 @@ pub struct User {
     pub date_created: String, // ISO string
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Deserialize)]
 pub struct DbUser {
     pub id: String,
     pub username: String,
@@ -36,7 +36,7 @@ pub struct DbSession {
     pub user_id: String,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Deserialize)]
 pub enum Permission {
     User,
     Contributor,

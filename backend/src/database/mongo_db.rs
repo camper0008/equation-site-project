@@ -1,6 +1,6 @@
 use crate::database::db_trait::DbError;
 use crate::models::{DbEquation, DbSession, DbUser, Permission, SessionToken};
-use mongodb::Client;
+use mongodb::{bson::doc, Client, Collection};
 
 #[derive(Clone)]
 pub struct MongoDb {
@@ -25,15 +25,13 @@ impl MongoDb {
         }
     }
     pub async fn get_user_from_name(&self, name: String) -> Result<Option<DbUser>, DbError> {
-        Ok(Some(DbUser {
-            id: "root".to_string(),
-            username: "root".to_string(),
-            permission: Permission::Root,
-            posts: vec![],
-            date_created: "1970-01-01T00:00:00.000Z".to_string(), // ISO string
-            //password: "passwd".to_string(),
-            password: "$2y$12$/9ahkt3cP8aCoiXDQQiRleRfzuD6Xn6j5XtPZWfGpHGmsDDxLb/16".to_string(), // "passwd" encrypted with a cost of 12
-        }))
+        let collection: Collection<DbUser> =
+            self.client.database(&self.db_name).collection("users");
+        match collection.find_one(doc! { "username": name }, None).await {
+            Ok(Some(user)) => Ok(Some(user)),
+            Ok(None) => Ok(None),
+            Err(err) => Err(DbError::Custom(err.to_string())),
+        }
     }
     pub async fn get_user_from_id(&self, id: String) -> Result<Option<DbUser>, DbError> {
         Ok(Some(DbUser {
@@ -73,5 +71,11 @@ impl MongoDb {
             //password: "passwd".to_string(),
             password: "$2y$12$/9ahkt3cP8aCoiXDQQiRleRfzuD6Xn6j5XtPZWfGpHGmsDDxLb/16".to_string(), // "passwd" encrypted with a cost of 12
         }))
+    }
+    pub async fn delete_user_session(
+        &mut self,
+        token: SessionToken,
+    ) -> Result<Option<()>, DbError> {
+        Ok(Some(()))
     }
 }

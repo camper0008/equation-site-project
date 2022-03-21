@@ -19,6 +19,7 @@ async fn main() -> std::io::Result<()> {
         App::new()
             .app_data(Data::new(Mutex::new(db.clone())))
             .service(users::login::login)
+            .service(users::logout::logout)
     })
     .bind(("127.0.0.1", 8080))?
     .run()

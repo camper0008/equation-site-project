@@ -61,11 +61,11 @@ fn bad_request_response(msg: String) -> HttpResponse {
 }
 
 #[post("/users/login")]
-pub async fn login(db: web::Data<Mutex<Db>>, request: web::Json<LoginRequest>) -> impl Responder {
+pub async fn login(db: web::Data<Mutex<Db>>, req: web::Json<LoginRequest>) -> impl Responder {
     let result = (**db)
         .lock()
         .unwrap()
-        .get_user_from_name(request.username.clone())
+        .get_user_from_name(req.username.clone())
         .await;
 
     if result.is_err() {
@@ -77,7 +77,7 @@ pub async fn login(db: web::Data<Mutex<Db>>, request: web::Json<LoginRequest>) -
         return bad_request_response("invalid login".to_string());
     }
     let user = found.unwrap();
-    let bcrypt_res = verify(request.password.clone(), &user.password);
+    let bcrypt_res = verify(req.password.clone(), &user.password);
     if bcrypt_res.is_err() {
         return internal_server_error_response("bcrypt error".to_string());
     };
