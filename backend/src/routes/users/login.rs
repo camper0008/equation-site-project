@@ -1,5 +1,5 @@
 use crate::database::db::Db;
-use crate::models::{DbSession, GenericResponse};
+use crate::models::{GenericResponse, InsertableDbSession};
 use crate::utils::gen_random_valid_string;
 use actix_web::{
     cookie::{time::Duration, Cookie, SameSite},
@@ -67,7 +67,7 @@ pub async fn login(db: web::Data<Mutex<Db>>, req: web::Json<LoginRequest>) -> im
     };
 
     let random_token_string = random_string_result.unwrap();
-    let session = DbSession {
+    let session = InsertableDbSession {
         user_id: user.id,
         token: random_token_string.to_string(),
     };

@@ -46,6 +46,12 @@ pub struct DbEquation {
 pub struct DbSession {
     pub token: SessionToken,
     pub user_id: String,
+    pub date_created: String, // ISO string
+}
+
+pub struct InsertableDbSession {
+    pub token: SessionToken,
+    pub user_id: String,
 }
 
 #[derive(Serialize, Deserialize)]

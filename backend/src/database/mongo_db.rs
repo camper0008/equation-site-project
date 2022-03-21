@@ -1,7 +1,26 @@
 use crate::database::db::DbError;
-use crate::models::{DbEquation, DbSession, DbUser, InsertableDbUser, SessionToken};
+use crate::models::{
+    DbEquation, DbSession, DbUser, InsertableDbSession, InsertableDbUser, SessionToken,
+};
 use crate::utils::{gen_random_valid_string, utc_date_iso_string};
-use mongodb::{bson::doc, Client, Collection};
+use mongodb::{bson::doc, options::IndexOptions, Client, Collection, IndexModel};
+use std::time::Duration;
+
+async fn create_session_expire_index(client: &Client, db_name: &str) {
+    let options = IndexOptions::builder()
+        .expire_after(Duration::from_secs(60 * 60 * 24 * 7))
+        .build();
+    let model = IndexModel::builder()
+        .keys(doc! { "date_created": 1 })
+        .options(options)
+        .build();
+    client
+        .database(db_name)
+        .collection::<DbSession>("sessions")
+        .create_index(model, None)
+        .await
+        .expect("creating an index should succeed");
+}
 
 #[derive(Clone)]
 pub struct MongoDb {
@@ -12,6 +31,9 @@ pub struct MongoDb {
 impl MongoDb {
     pub async fn new(uri: String, db_name: String) -> Self {
         let client = Client::with_uri_str(uri).await.expect("failed to connect");
+
+        create_session_expire_index(&client, &db_name).await;
+
         Self {
             client: client,
             db_name: db_name,
@@ -95,9 +117,19 @@ impl MongoDb {
             Err(err) => Err(DbError::Custom(err.to_string())),
         }
     }
-    pub async fn add_session(&mut self, session: DbSession) -> Result<(), DbError> {
+    pub async fn add_session(
+        &mut self,
+        insertable_session: InsertableDbSession,
+    ) -> Result<(), DbError> {
         let collection: Collection<DbSession> =
             self.client.database(&self.db_name).collection("sessions");
+
+        let session = DbSession {
+            token: insertable_session.token,
+            user_id: insertable_session.user_id,
+            date_created: utc_date_iso_string(),
+        };
+
         let result = collection.insert_one(session, None).await;
         match result {
             Ok(_) => Ok(()),
