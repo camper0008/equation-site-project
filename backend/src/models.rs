@@ -30,7 +30,6 @@ pub struct DbEquation {
 
 #[derive(Serialize)]
 pub enum Permission {
-    Unauthenticated,
     User,
     Contributor,
     Root,

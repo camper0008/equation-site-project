@@ -28,7 +28,7 @@ impl MongoDb {
         Ok(Some(DbUser {
             id: "root".to_string(),
             username: "root".to_string(),
-            permission: Permission::Unauthenticated,
+            permission: Permission::Root,
             posts: vec![],
             date_created: "1970-01-01T00:00:00.000Z".to_string(), // ISO string
             //password: "passwd".to_string(),
