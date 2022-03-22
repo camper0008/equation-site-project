@@ -1,6 +1,7 @@
 import { StateManager } from "../StateManager";
 import { Component } from "solid-js";
 import "../assets/site-header.scss";
+import "../assets/logo.scss";
 import { API_URL, get, post } from "../api";
 
 interface Props {

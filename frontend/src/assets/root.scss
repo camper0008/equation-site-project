@@ -21,6 +21,10 @@ body {
     color: var(--clr-light);
 }
 
+body, #root {
+    min-height: 100vh;
+}
+
 a[href] {
     color: var(--clr-brand)
 }

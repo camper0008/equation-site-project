@@ -1,16 +1,20 @@
 import { Logo } from "../components/Logo";
 import { StateManager } from "../StateManager";
 import { Component } from "solid-js";
+import "../assets/editor.scss";
 
-interface Props {
-    state: StateManager;
-}
-
-const Editor: Component<Props> = ({ state }) => {
+const Editor: Component<Props> = () => {
     return (
-        <>
-            <Logo state={state} />
-        </>
+        <div id="equation-editor-container">
+            <div id="editor-container">
+                <h2>Redigering</h2>
+                <textarea id="editor"></textarea>
+            </div>
+            <div id="preview-container">
+                <h2>Forhåndsvisning</h2>
+                <div id="preview"></div>
+            </div>
+        </div>
     );
 };
 
