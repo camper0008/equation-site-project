@@ -36,6 +36,10 @@ a[href] {
     color: var(--clr-brand);
 }
 
+button {
+    cursor: pointer;
+}
+
 :focus-visible {
     outline: 1px solid var(--clr-light);
     outline-offset: 0.4rem;

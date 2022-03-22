@@ -5,6 +5,7 @@ import { render } from "solid-js/web";
 import { pathMatches } from "./utils";
 import { StateManager } from "./StateManager";
 import { SiteHeader } from "./components/SiteHeader";
+import { Footer } from "./components/Footer";
 import { User, fetchUserInfo } from "./api";
 
 const NotFound = lazy(() => import("./pages/NotFound"));
@@ -41,6 +42,7 @@ const index = () => {
                     <SearchPage state={state} />
                 </Match>
             </Switch>
+            <Footer />
         </>
     );
 };
