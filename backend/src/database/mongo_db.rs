@@ -167,7 +167,7 @@ impl MongoDb {
         let user_collection: Collection<DbUser> =
             self.client.database(&self.db_name).collection("users");
         let user_result = match user_collection
-            .find_one(doc! { "user_id": session.user_id }, None)
+            .find_one(doc! { "id": session.user_id }, None)
             .await
         {
             Ok(Some(user)) => Ok(Some(user)),

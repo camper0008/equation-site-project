@@ -83,7 +83,7 @@ struct Request {
 
 * Cookie
 
-`token: <auth token>`
+`SESSION_TOKEN: <auth token>`
 
 * Body
 
@@ -100,7 +100,7 @@ struct Response {
 
 * Cookie
 
-`token: <auth token>`
+`SESSION_TOKEN: <auth token>`
 
 #### Response
 
@@ -143,6 +143,30 @@ struct Response {
 }
 ```
 
+### GET `/users/info`
+
+#### Request
+
+* Cookie
+
+`SESSION_TOKEN: <auth token>`
+
+#### Response
+
+* Status
+
+`200 OK | 400 Bad Request`
+
+* Body
+
+```rs
+struct Response {
+    ok: bool,
+    msg: String, // success | unauthorized
+    user: Option<User>
+}
+```
+
 ### POST `/equations/create`
 
 #### Request
@@ -151,7 +175,7 @@ struct Response {
 
 * Cookie
 
-`token: <auth token>`
+`SESSION_TOKEN: <auth token>`
 
 * Body
 
@@ -185,7 +209,7 @@ struct Response {
 
 * Cookie
 
-`token: <auth token>`
+`SESSION_TOKEN: <auth token>`
 
 * Path Parameters
 
@@ -219,7 +243,7 @@ struct Response {
 
 * Cookie
 
-`token: <auth token>`
+`SESSION_TOKEN: <auth token>`
 
 * Path Parameters
 
