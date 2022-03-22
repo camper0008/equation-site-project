@@ -1,5 +1,5 @@
 export const urlParams = (pattern: string, path: string) => {
-    const params: {[key: string]: string} = {};
+    const params: { [key: string]: string } = {};
 
     const splitPattern = pattern.split("/");
     const splitPath = path.split("/");
@@ -16,14 +16,13 @@ export const urlParams = (pattern: string, path: string) => {
         }
     }
     return params;
-}
+};
 
 export const pathMatches = (pattern: string, path: string) => {
     const splitPattern = pattern.split("/");
     const splitPath = path.split("/");
 
-    if (splitPath.length != splitPattern.length)
-        return false;
+    if (splitPath.length != splitPattern.length) return false;
 
     for (let i = 0; i < splitPattern.length; i++) {
         if (splitPattern[i] != splitPath[i] && splitPattern[i][0] != ":")
@@ -31,4 +30,4 @@ export const pathMatches = (pattern: string, path: string) => {
     }
 
     return true;
-}
+};

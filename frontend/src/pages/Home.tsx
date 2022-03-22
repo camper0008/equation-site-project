@@ -4,13 +4,15 @@ import { SearchWrapper } from "../components/SearchWrapper";
 import { StateManager } from "../StateManager";
 
 interface Props {
-    state: StateManager
+    state: StateManager;
 }
 
-const Home: Component<Props> = ({state}) => {
-    return (<>
-        <SearchWrapper state={state} />
-    </>);
-}
+const Home: Component<Props> = ({ state }) => {
+    return (
+        <>
+            <SearchWrapper state={state} />
+        </>
+    );
+};
 
 export default Home;

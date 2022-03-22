@@ -5,21 +5,19 @@ import "../assets/form.scss";
 import { API_URL, post } from "../api";
 
 interface Props {
-    state: StateManager,
+    state: StateManager;
 }
 
 interface fieldIssuesStore {
-    username: string,
-    password: string,
+    username: string;
+    password: string;
 }
 
 const capitalizeFirstLetter = (msg: string) => {
-    return msg.slice(0,1).toUpperCase() + msg.slice(1);
-}
+    return msg.slice(0, 1).toUpperCase() + msg.slice(1);
+};
 
-const Login: Component<Props> = ({state}) => {
-
-
+const Login: Component<Props> = ({ state }) => {
     const [fetching, setFetching] = createSignal(false);
 
     const [fieldIssues, setFieldIssues] = createSignal({
@@ -28,17 +26,20 @@ const Login: Component<Props> = ({state}) => {
     } as fieldIssuesStore);
 
     const validateFields = (state: StateManager) => {
-
         const issues: fieldIssuesStore = { username: "", password: "" };
 
-        const usernameElement = document.getElementById("username") as HTMLInputElement;
-        const passwordElement = document.getElementById("password") as HTMLInputElement;
+        const usernameElement = document.getElementById(
+            "username",
+        ) as HTMLInputElement;
+        const passwordElement = document.getElementById(
+            "password",
+        ) as HTMLInputElement;
 
         if (usernameElement.value === "") {
-            issues.username = "Felt må ikke være tomt"
+            issues.username = "Felt må ikke være tomt";
         }
         if (passwordElement.value === "") {
-            issues.password = "Felt må ikke være tomt"
+            issues.password = "Felt må ikke være tomt";
         }
 
         setFieldIssues(issues);
@@ -46,11 +47,15 @@ const Login: Component<Props> = ({state}) => {
         if (issues.username === "" && issues.password === "") {
             sendRequest(state);
         }
-    }
+    };
 
     const sendRequest = async (state: StateManager) => {
-        const usernameElement = document.getElementById("username") as HTMLInputElement;
-        const passwordElement = document.getElementById("password") as HTMLInputElement;
+        const usernameElement = document.getElementById(
+            "username",
+        ) as HTMLInputElement;
+        const passwordElement = document.getElementById(
+            "password",
+        ) as HTMLInputElement;
 
         setFetching(true);
 
@@ -67,39 +72,66 @@ const Login: Component<Props> = ({state}) => {
             setFieldIssues({
                 username: capitalizeFirstLetter(res.msg),
                 password: capitalizeFirstLetter(res.msg),
-            })
+            });
         } else {
             state.goto("/");
             state.refetchUserLoggedIn();
         }
-    }
+    };
 
     const redirectToRegister = (event: Event) => {
         event.preventDefault();
         state.goto("/register");
-    }
+    };
 
-    return <>
-        <Logo state={state} />
-        <div class="form" aria-labelledby="form-title">
-        <h2 id="form-title">Login</h2>
+    return (
+        <>
+            <Logo state={state} />
+            <div class="form" aria-labelledby="form-title">
+                <h2 id="form-title">Login</h2>
 
-            <p id="username-error" class="error">{fieldIssues().username}</p>
-            <label for="username">Brugernavn</label>
-            <input {...{disabled: fetching() ? true : undefined}} id="username"/>
-            
-            <p id="password-error" class="error">{fieldIssues().password}</p>
-            <label for="password">Adgangskode</label>
-            <input {...{disabled: fetching() ? true : undefined}} 
-            type="password" id="password"
-            onKeyDown={ (event: KeyboardEvent) => { if (event.code === "Enter") validateFields(state); } }/>
-            
-            <button {...{disabled: fetching() ? true : undefined}} 
-            id="submit" onClick={() => {validateFields(state)}}>Indsend</button>
-            
-            <p>Har du ikke en bruger? <a href="/register" onClick={redirectToRegister}>Opret ny bruger</a> i stedet.</p>
-        </div>
-    </>
-}
+                <p id="username-error" class="error">
+                    {fieldIssues().username}
+                </p>
+                <label for="username">Brugernavn</label>
+                <input
+                    {...{ disabled: fetching() ? true : undefined }}
+                    id="username"
+                />
+
+                <p id="password-error" class="error">
+                    {fieldIssues().password}
+                </p>
+                <label for="password">Adgangskode</label>
+                <input
+                    {...{ disabled: fetching() ? true : undefined }}
+                    type="password"
+                    id="password"
+                    onKeyDown={(event: KeyboardEvent) => {
+                        if (event.code === "Enter") validateFields(state);
+                    }}
+                />
+
+                <button
+                    {...{ disabled: fetching() ? true : undefined }}
+                    id="submit"
+                    onClick={() => {
+                        validateFields(state);
+                    }}
+                >
+                    Indsend
+                </button>
+
+                <p>
+                    Har du ikke en bruger?{" "}
+                    <a href="/register" onClick={redirectToRegister}>
+                        Opret ny bruger
+                    </a>{" "}
+                    i stedet.
+                </p>
+            </div>
+        </>
+    );
+};
 
 export default Login;
