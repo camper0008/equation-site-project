@@ -11,6 +11,7 @@ interface Props {
 interface fieldIssuesStore {
     username: string;
     password: string;
+    gpdr: string;
 }
 
 const capitalizeFirstLetter = (msg: string) => {
@@ -23,6 +24,7 @@ const Register: Component<Props> = ({ state }) => {
     const [fieldIssues, setFieldIssues] = createSignal({
         username: "",
         password: "",
+        gpdr: "",
     } as fieldIssuesStore);
 
     const validateFields = (state: StateManager) => {
@@ -32,8 +34,13 @@ const Register: Component<Props> = ({ state }) => {
         const passwordElement = document.getElementById(
             "password",
         ) as HTMLInputElement;
+        const gpdrElement = document.getElementById("gpdr") as HTMLInputElement;
 
-        const issues: fieldIssuesStore = { username: "", password: "" };
+        const issues: fieldIssuesStore = {
+            username: "",
+            password: "",
+            gpdr: "",
+        };
 
         if (usernameElement.value === "") {
             issues.username = "Felt må ikke være tomt";
@@ -41,10 +48,17 @@ const Register: Component<Props> = ({ state }) => {
         if (passwordElement.value === "") {
             issues.password = "Felt må ikke være tomt";
         }
+        if (gpdrElement.checked === false) {
+            issues.gpdr = "Felt må ikke være tomt";
+        }
 
         setFieldIssues(issues);
 
-        if (issues.username === "" && issues.password === "") {
+        if (
+            issues.username === "" &&
+            issues.password === "" &&
+            issues.gpdr === ""
+        ) {
             sendRequest(state);
         }
     };
@@ -75,6 +89,7 @@ const Register: Component<Props> = ({ state }) => {
                         "Brugernavn allerede i brug",
                     ),
                     password: "",
+                    gpdr: "",
                 });
             }
         } else {
@@ -82,9 +97,9 @@ const Register: Component<Props> = ({ state }) => {
         }
     };
 
-    const redirectToLogin = (event: Event) => {
+    const redirect = (event: Event, path: string) => {
         event.preventDefault();
-        state.goto("/login");
+        state.goto(path);
     };
 
     return (
@@ -92,19 +107,13 @@ const Register: Component<Props> = ({ state }) => {
             <Logo state={state} />
             <div class="form" aria-labelledby="form-title">
                 <h2 id="form-title">Opret bruger</h2>
-
-                <p id="username-error" class="error">
-                    {fieldIssues().username}
-                </p>
+                <p class="error">{fieldIssues().username}</p>
                 <label for="username">Brugernavn</label>
                 <input
                     {...{ disabled: fetching() ? true : undefined }}
                     id="username"
                 />
-
-                <p id="password-error" class="error">
-                    {fieldIssues().password}
-                </p>
+                <p class="error">{fieldIssues().password}</p>
                 <label for="password">Adgangskode</label>
                 <input
                     {...{ disabled: fetching() ? true : undefined }}
@@ -114,7 +123,22 @@ const Register: Component<Props> = ({ state }) => {
                         if (event.code === "Enter") validateFields(state);
                     }}
                 />
-
+                <p class="error">{fieldIssues().gpdr}</p>
+                <div>
+                    <input type="checkbox" id="gpdr" />{" "}
+                    <label for="gpdr">
+                        Ved at sætte kryds erkender jeg, at jeg har læst{" "}
+                        <a
+                            href="/privacy"
+                            onClick={(event: Event) =>
+                                redirect(event, "/privacy")
+                            }
+                        >
+                            privatlivspolitikken
+                        </a>{" "}
+                        og giver samtykke.
+                    </label>
+                </div>
                 <button
                     {...{ disabled: fetching() ? true : undefined }}
                     id="submit"
@@ -126,7 +150,10 @@ const Register: Component<Props> = ({ state }) => {
                 </button>
                 <p>
                     Har du allerede en bruger?{" "}
-                    <a href="/login" onClick={redirectToLogin}>
+                    <a
+                        href="/login"
+                        onClick={(event: Event) => redirect(event, "/login")}
+                    >
                         Login
                     </a>{" "}
                     i stedet.

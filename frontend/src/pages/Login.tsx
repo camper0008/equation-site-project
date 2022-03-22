@@ -79,9 +79,9 @@ const Login: Component<Props> = ({ state }) => {
         }
     };
 
-    const redirectToRegister = (event: Event) => {
+    const redirect = (event: Event, path: string) => {
         event.preventDefault();
-        state.goto("/register");
+        state.goto(path);
     };
 
     return (
@@ -124,7 +124,10 @@ const Login: Component<Props> = ({ state }) => {
 
                 <p>
                     Har du ikke en bruger?{" "}
-                    <a href="/register" onClick={redirectToRegister}>
+                    <a
+                        href="/register"
+                        onClick={(event: Event) => redirect(event, "/register")}
+                    >
                         Opret ny bruger
                     </a>{" "}
                     i stedet.

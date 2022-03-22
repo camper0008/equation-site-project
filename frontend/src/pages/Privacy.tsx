@@ -59,8 +59,8 @@ const Legal = () => {
             <ol>
                 <li>
                     Et "hashed" password, er per definition etvejs, og det er
-                    derfor umuligt at få réelt password tilbage. Mere
-                    information kan findes her:{" "}
+                    derfor umuligt et password ud fra det. Mere information kan
+                    findes her:{" "}
                     <a
                         href="https://en.wikipedia.org/wiki/Hash_function"
                         target="_blank"

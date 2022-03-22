@@ -9,7 +9,7 @@ interface Props {
 export const Footer: Component<Props> = ({ state }) => {
     const legalClickHandler = (event: Event) => {
         event.preventDefault();
-        state.goto("/legal");
+        state.goto("/privacy");
     };
 
     return (
@@ -18,15 +18,21 @@ export const Footer: Component<Props> = ({ state }) => {
             <a href="https://tphollebeek.dk" target="_blank">
                 Theis Pieter Hollebeek
             </a>{" "}
-            og{" "}
+            med input fra{" "}
             <a href="https://simonfromjakobsen.netlify.app" target="_blank">
                 Simon From Jakobsen
             </a>{" "}
-            - Sidens{" "}
-            <a href="/legal" onClick={legalClickHandler}>
-                GPDR
+            | Vores{" "}
+            <a href="/privacy" onClick={legalClickHandler}>
+                Privatlivspolitik
+            </a>{" "}
+            | Koden bag denne hjemmeside findes på{" "}
+            <a
+                href="https://github.com/camper0008/equation-site-project"
+                target="_blank"
+            >
+                GitHub
             </a>
-            .
         </footer>
     );
 };
