@@ -20,13 +20,18 @@ export class EsParser {
     private lastCharWasWordChar = false;
     private quoteDepth = 0;
     private textBuffer = "";
+    private uninterruptedNewlines = 0;
 
-    constructor(public text: string) {}
+    private text: string;
+
+    constructor(text: string) {
+        this.text = text;
+    }
 
     public parse(): EsDocument {
         this.components = [];
         for (const char of this.text) this.parseChar(char);
-        this.endTextComponent();
+        this.endTextComponent(EsParserStates.TEXT);
         return new EsDocument(this.components);
     }
 
@@ -47,24 +52,36 @@ export class EsParser {
         } else {
             this.lastCharWasWordChar = false;
         }
+        if (char === "\n") {
+            this.uninterruptedNewlines++;
+            if (this.uninterruptedNewlines >= 2) {
+                this.uninterruptedNewlines = 0;
+                return this.endTextComponent(EsParserStates.TEXT);
+            }
+        } else if (/\S/.test(char)) {
+            this.uninterruptedNewlines = 0;
+        }
         if (char == '"') this.quoteDepth++;
         else this.quoteDepth = 0;
-        if (this.quoteDepth === 2) return this.endTextComponent();
+        if (this.quoteDepth === 2)
+            return this.endTextComponent(EsParserStates.DIRECTIVE);
         else this.textBuffer += char;
     }
 
-    private endTextComponent() {
-        this.components.push(
-            new EsText(
-                this.textBuffer.replace(
-                    new RegExp(`${this.lastWord}\\s*"$`),
-                    "",
+    private endTextComponent(newState: EsParserStates) {
+        if (/\S/.test(this.textBuffer)) {
+            this.components.push(
+                new EsText(
+                    this.textBuffer.replace(
+                        new RegExp(`${this.lastWord}\\s*"$`),
+                        "",
+                    ),
                 ),
-            ),
-        );
+            );
+        }
         this.textBuffer = "";
         this.quoteDepth = 0;
-        this.state = EsParserStates.DIRECTIVE;
+        this.state = newState;
     }
 
     private walkDirective(char: string) {
