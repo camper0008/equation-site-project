@@ -183,7 +183,10 @@ impl MongoDb {
     ) -> Result<Option<DbSession>, DbError> {
         let collection: Collection<DbSession> =
             self.client.database(&self.db_name).collection("sessions");
-        match collection.find_one(doc! { "token": token }, None).await {
+        match collection
+            .find_one_and_delete(doc! { "token": token }, None)
+            .await
+        {
             Ok(Some(session)) => Ok(Some(session)),
             Ok(None) => Ok(None),
             Err(err) => Err(DbError::Custom(err.to_string())),
