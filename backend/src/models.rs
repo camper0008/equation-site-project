@@ -13,7 +13,6 @@ pub struct User {
     pub id: String,
     pub username: String,
     pub permission: Permission,
-    pub posts: Vec<String>,   // post ids
     pub date_created: String, // ISO string
 }
 
@@ -22,7 +21,6 @@ pub struct DbUser {
     pub id: String,
     pub username: String,
     pub permission: Permission,
-    pub posts: Vec<String>,   // post ids
     pub date_created: String, // ISO string
     pub password: String,
 }

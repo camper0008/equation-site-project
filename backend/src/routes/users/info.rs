@@ -54,7 +54,6 @@ pub async fn info(db: web::Data<Mutex<Db>>, req: HttpRequest) -> impl Responder 
         id: db_user.id,
         username: db_user.username,
         permission: db_user.permission,
-        posts: db_user.posts,
         date_created: db_user.date_created,
     };
 

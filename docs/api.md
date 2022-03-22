@@ -45,7 +45,6 @@ struct User {
     id: String, // randomly generated
     username: String,
     permission: Permission,
-    posts: [String], // equation ids
     date_created: String, // ISO string
 }
 ```
@@ -66,7 +65,7 @@ enum Permission {
 
 #### Request
 
-* Body
+- Body
 
 ```rs
 struct Request {
@@ -77,15 +76,15 @@ struct Request {
 
 #### Response
 
-* Status
+- Status
 
 `200 OK | 400 Bad Request`
 
-* Cookie
+- Cookie
 
 `SESSION_TOKEN: <auth token>`
 
-* Body
+- Body
 
 ```rs
 struct Response {
@@ -98,13 +97,13 @@ struct Response {
 
 #### Request
 
-* Cookie
+- Cookie
 
 `SESSION_TOKEN: <auth token>`
 
 #### Response
 
-* Status
+- Status
 
 `200 OK | 400 Bad Request`
 
@@ -119,7 +118,7 @@ struct Response {
 
 #### Request
 
-* Body
+- Body
 
 ```rs
 struct Request {
@@ -130,11 +129,11 @@ struct Request {
 
 #### Response
 
-* Status
+- Status
 
 `200 OK | 400 Bad Request`
 
-* Body
+- Body
 
 ```rs
 struct Response {
@@ -147,17 +146,17 @@ struct Response {
 
 #### Request
 
-* Cookie
+- Cookie
 
 `SESSION_TOKEN: <auth token>`
 
 #### Response
 
-* Status
+- Status
 
 `200 OK | 400 Bad Request`
 
-* Body
+- Body
 
 ```rs
 struct Response {
@@ -173,11 +172,11 @@ struct Response {
 
 **Requires a permission level of contributor or above**
 
-* Cookie
+- Cookie
 
 `SESSION_TOKEN: <auth token>`
 
-* Body
+- Body
 
 ```rs
 struct Request {
@@ -188,11 +187,11 @@ struct Request {
 
 #### Response
 
-* Status
+- Status
 
 `200 OK | 400 Bad Request`
 
-* Body
+- Body
 
 ```rs
 struct Response {
@@ -207,11 +206,11 @@ struct Response {
 
 **Requires a permission level of contributor or above**
 
-* Cookie
+- Cookie
 
 `SESSION_TOKEN: <auth token>`
 
-* Path Parameters
+- Path Parameters
 
 ```rs
 struct Param {
@@ -221,11 +220,11 @@ struct Param {
 
 #### Response
 
-* Status
+- Status
 
 `200 OK | 400 Bad Request`
 
-* Body
+- Body
 
 ```rs
 struct Response {
@@ -234,18 +233,17 @@ struct Response {
 }
 ```
 
-
 ### POST `/equations/edit/:post_id:`
 
 #### Request
 
 **Requires a permission level of contributor or above**
 
-* Cookie
+- Cookie
 
 `SESSION_TOKEN: <auth token>`
 
-* Path Parameters
+- Path Parameters
 
 ```rs
 struct Param {
@@ -253,7 +251,7 @@ struct Param {
 }
 ```
 
-* Body
+- Body
 
 ```rs
 struct Request {
@@ -264,11 +262,11 @@ struct Request {
 
 #### Response
 
-* Status
+- Status
 
 `200 OK | 400 Bad Request`
 
-* Body
+- Body
 
 ```rs
 struct Response {
@@ -281,7 +279,7 @@ struct Response {
 
 #### Request
 
-* Path Parameters
+- Path Parameters
 
 ```rs
 struct Param {
@@ -291,11 +289,11 @@ struct Param {
 
 #### Response
 
-* Status
+- Status
 
 `200 OK`
 
-* Body
+- Body
 
 ```rs
 struct Response {
@@ -319,7 +317,7 @@ struct Response {
 
 ### GET `/equations/search/:query`
 
-* Path Parameters
+- Path Parameters
 
 ```rs
 struct Param {
@@ -329,11 +327,11 @@ struct Param {
 
 #### Response
 
-* Status
+- Status
 
 `200 OK | 400 Bad Request`
 
-* Body
+- Body
 
 ```rs
 struct Response {

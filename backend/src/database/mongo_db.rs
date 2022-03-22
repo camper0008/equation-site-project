@@ -67,7 +67,6 @@ impl MongoDb {
             username: insertable_user.username,
             password: insertable_user.password,
             permission: insertable_user.permission,
-            posts: vec![],
             date_created: utc_date_iso_string(),
         };
 
