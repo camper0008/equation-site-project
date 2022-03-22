@@ -70,6 +70,7 @@ const Login: Component<Props> = ({state}) => {
             })
         } else {
             state.goto("/");
+            state.refetchUserLoggedIn();
         }
     }
 

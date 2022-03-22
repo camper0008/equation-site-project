@@ -3,15 +3,19 @@
     display: flex;
     font-size: 1.25rem;
     gap: 1rem;
+    font-family: var(--ff-brand);
 
     .logo {
         margin-right: 1.5rem;
     }
 
+    p {
+        margin: 0;
+    }
+
     a {
         color: var(--clr-light);
         text-decoration: none;
-        font-family: var(--ff-brand);
 
         &:hover {
             text-decoration: 1px solid underline;
