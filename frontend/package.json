@@ -13,7 +13,7 @@
   "scripts": {
     "start": "solid-scripts start",
     "build": "solid-scripts build",
-    "type-check": "tsc"
+    "type-check": "clear && tsc"
   },
   "browserslist": [
     "Chrome 74",

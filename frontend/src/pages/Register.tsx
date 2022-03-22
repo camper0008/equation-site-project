@@ -26,16 +26,16 @@ const Login: Component<Props> = ({state}) => {
         password: "",
     } as fieldIssuesStore);
 
-    let usernameElement: HTMLInputElement;
-    let passwordElement: HTMLInputElement;
-
     const validateFields = (state: StateManager) => {
+        const usernameElement = document.getElementById("username") as HTMLInputElement;
+        const passwordElement = document.getElementById("password") as HTMLInputElement;
+
         const issues: fieldIssuesStore = { username: "", password: "" };
 
-        if (username.value === "") {
+        if (usernameElement.value === "") {
             issues.username = "Felt må ikke være tomt"
         }
-        if (password.value === "") {
+        if (passwordElement.value === "") {
             issues.password = "Felt må ikke være tomt"
         }
 
@@ -47,6 +47,9 @@ const Login: Component<Props> = ({state}) => {
     }
 
     const sendRequest = async (state: StateManager) => {
+        const usernameElement = document.getElementById("username") as HTMLInputElement;
+        const passwordElement = document.getElementById("password") as HTMLInputElement;
+        
         setFetching(true);
 
         const body = JSON.stringify({
@@ -82,12 +85,12 @@ const Login: Component<Props> = ({state}) => {
 
             <p id="username-error" class="error">{fieldIssues().username}</p>
             <label for="username">Brugernavn</label>
-            <input {...{disabled: fetching() ? true : undefined}} ref={usernameElement} id="username"/>
+            <input {...{disabled: fetching() ? true : undefined}} id="username"/>
             
             <p id="password-error" class="error">{fieldIssues().password}</p>
             <label for="password">Adgangskode</label>
             <input {...{disabled: fetching() ? true : undefined}} 
-            ref={passwordElement} type="password" id="password"
+            type="password" id="password"
             onKeyDown={ (event: KeyboardEvent) => { if (event.code === "Enter") validateFields(state); } }/>
             
             <button {...{disabled: fetching() ? true : undefined}} 
