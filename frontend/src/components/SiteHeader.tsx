@@ -41,15 +41,23 @@ export const SiteHeader: Component<Props> = ({ state }) => {
                     <a href="/logout" onClick={logoutClickHandler}>
                         Logout
                     </a>
-                    <a
-                        href="/editor"
-                        onClick={(event) =>
-                            anchorClickHandler(event, "/editor")
-                        }
-                    >
-                        Ny editor
-                    </a>
-                    ;
+                    {(() => {
+                        let permission = state.userLoggedIn()!.permission;
+                        console.log(permission);
+                        return permission === "Contributor" ||
+                            permission === "Root" ? (
+                            <a
+                                href="/editor"
+                                onClick={(event) =>
+                                    anchorClickHandler(event, "/editor")
+                                }
+                            >
+                                Ny formel
+                            </a>
+                        ) : (
+                            <></>
+                        );
+                    })()}
                 </>
             );
         }
