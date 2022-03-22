@@ -21,6 +21,10 @@ code""fn main() {
 }""`;
 };
 
+interface Props {
+    state: StateManager;
+}
+
 const exampleHtml = (): string => {
     const doc = new EsParser(exampleText()).parse();
     return doc.toHtml();

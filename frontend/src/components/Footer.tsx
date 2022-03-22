@@ -1,6 +1,17 @@
 import "../assets/footer.scss";
+import { StateManager } from "../StateManager";
+import { Component } from "solid-js";
 
-export const Footer = () => {
+interface Props {
+    state: StateManager;
+}
+
+export const Footer: Component<Props> = ({ state }) => {
+    const legalClickHandler = (event: Event) => {
+        event.preventDefault();
+        state.goto("/legal");
+    };
+
     return (
         <footer>
             Skabt af{" "}
@@ -11,7 +22,11 @@ export const Footer = () => {
             <a href="https://simonfromjakobsen.netlify.app" target="_blank">
                 Simon From Jakobsen
             </a>{" "}
-            - Sidens <a href="/legal">GPDR</a>
+            - Sidens{" "}
+            <a href="/legal" onClick={legalClickHandler}>
+                GPDR
+            </a>
+            .
         </footer>
     );
 };

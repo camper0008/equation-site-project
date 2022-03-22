@@ -21,15 +21,11 @@ body {
     background-color: var(--clr-darkest);
     font-family: var(--ff-body);
     color: var(--clr-light);
+    min-height: 100vh;
 }
 
 img {
     max-width: 100%;
-}
-
-body,
-#root {
-    min-height: 100vh;
 }
 
 a[href] {
