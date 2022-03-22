@@ -23,6 +23,10 @@ body {
     color: var(--clr-light);
 }
 
+img {
+    max-width: 100%;
+}
+
 body,
 #root {
     min-height: 100vh;

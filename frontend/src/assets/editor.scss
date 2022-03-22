@@ -21,6 +21,9 @@
             display: block;
             flex: 1;
 
+            min-width: 100%;
+            width: 750px;
+
             border: none;
             background-color: transparent;
             background-color: var(--clr-dark);
