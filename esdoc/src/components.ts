@@ -7,18 +7,18 @@ export interface EsComponent {
 }
 
 export class EsText implements EsComponent {
-    constructor(public text: string) { }
+    constructor(public text: string) {}
 
     public toHtml(): string {
         const text = this.text
             .trim()
-            .replace(/\n[ \t]*\n/, '<br>')
-            .replace(/\s+/g, ' ')
+            .replace(/\n[ \t]*\n/, "<br>")
+            .replace(/\s+/g, " ");
         return /*html*/ `<p class="escomponent estext">${text}</p>`;
     }
 
     public toJson(): string {
-        return `{"type":"text","text":"${this.text.replace(/\n/g, '\\n')}"}`;
+        return `{"type":"text","text":"${this.text.replace(/\n/g, "\\n")}"}`;
     }
 
     public toMarkdown(): string {
@@ -27,7 +27,7 @@ export class EsText implements EsComponent {
 }
 
 export class EsTitle implements EsComponent {
-    constructor(public text: string) { }
+    constructor(public text: string) {}
 
     public toHtml(): string {
         return /*html*/ `<h2 class="escomponent estitle">${this.text}</h2>`;
@@ -43,7 +43,7 @@ export class EsTitle implements EsComponent {
 }
 
 export class EsImage implements EsComponent {
-    constructor(public src: string, public alt: string) { }
+    constructor(public src: string, public alt: string) {}
 
     public toHtml(): string {
         return /*html*/ `<img class="escomponent esimage" src="${this.src}" alt="${this.alt}">`;
@@ -59,15 +59,17 @@ export class EsImage implements EsComponent {
 }
 
 export class EsMath implements EsComponent {
-    constructor(public latex: string) { }
+    constructor(public latex: string) {}
 
     public toHtml(): string {
-        return renderToString(this.latex, { throwOnError: true })
-            .replace('<span class="katex">', '<span class="escomponent esmath katex">');
+        return renderToString(this.latex, { throwOnError: true }).replace(
+            '<span class="katex">',
+            '<span class="escomponent esmath katex">',
+        );
     }
 
     public toJson(): string {
-        return `{"type":"math","latex":"${this.latex.replace(/\\/g, '\\\\')}"}`;
+        return `{"type":"math","latex":"${this.latex.replace(/\\/g, "\\\\")}"}`;
     }
 
     public toMarkdown(): string {
@@ -76,19 +78,23 @@ export class EsMath implements EsComponent {
 }
 
 export class EsCode implements EsComponent {
-    constructor(public code: string, public lang?: string) { }
+    constructor(public code: string, public lang?: string) {}
 
     public toHtml(): string {
-        const langClass = this.lang ? `lang-${this.lang}` : '';
+        const langClass = this.lang ? `lang-${this.lang}` : "";
         return /*html*/ `<code class="escomponent escode ${langClass}"><pre>${this.code}</pre></code>`;
     }
 
     public toJson(): string {
-        return `{"type":"code","lang":"${this.lang}","code":${JSON.stringify(this.code)}}`;
+        return `{"type":"code","lang":"${this.lang}","code":${JSON.stringify(
+            this.code,
+        )}}`;
     }
 
     public toMarkdown(): string {
-        const backticks = '```';
-        return `${backticks}${this.lang ?? ''}\n${this.code.trim()}\n${backticks}`;
+        const backticks = "```";
+        return `${backticks}${
+            this.lang ?? ""
+        }\n${this.code.trim()}\n${backticks}`;
     }
 }
