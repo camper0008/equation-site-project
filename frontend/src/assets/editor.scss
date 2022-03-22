@@ -7,7 +7,7 @@
     height: 100%;
     display: flex;
     flex: 1;
-    
+
     h2 {
         padding: 0 1rem;
     }
@@ -20,10 +20,10 @@
         #editor {
             display: block;
             flex: 1;
-            
+
             border: none;
             background-color: transparent;
-        background-color: var(--clr-dark);
+            background-color: var(--clr-dark);
             padding: 0.75rem;
 
             resize: horizontal;
@@ -34,6 +34,11 @@
 
             overflow-y: auto;
             z-index: 1;
+
+            &:focus-visible {
+                border-radius: 0;
+                outline-offset: 0;
+            }
         }
     }
 
@@ -41,11 +46,15 @@
         flex: 1;
         display: flex;
         flex-direction: column;
-    #preview {
-        flex: 1;
-        background-color: var(--clr-darker);
-    }
+        #preview {
+            *:first-child {
+                margin-top: 0;
+            }
 
+            padding: 0.75rem;
+            flex: 1;
+            background-color: var(--clr-darker);
+            font-size: 1.1rem;
+        }
     }
-
 }

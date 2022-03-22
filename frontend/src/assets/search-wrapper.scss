@@ -20,13 +20,13 @@
         display: flex;
         align-items: center;
         gap: 0.5em;
-        
+
         min-width: 300px;
         max-width: 800px;
         width: 50%;
         margin: 4rem auto;
         padding: 0.5em;
-       
+
         border-radius: 0.325rem;
         background-color: var(--clr-dark);
 
@@ -38,8 +38,8 @@
             border: none;
             background-color: transparent;
 
-            // i dont know why, but both width and flex is required 
-            // for it to not overflow on smaller screens 
+            // i dont know why, but both width and flex is required
+            // for it to not overflow on smaller screens
             flex: 1;
             width: 100%;
 
@@ -65,5 +65,4 @@
     &.focused .search-container {
         transform: scale(1.05, 1.05);
     }
-
 }
