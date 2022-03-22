@@ -10,7 +10,7 @@ export class StateManager {
     ) {}
 
     goto(path: string) {
-        window.history.pushState(path, "", path);
+        window.history.pushState({}, "", path);
         this.setPath(path);
     }
 }

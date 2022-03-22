@@ -31,6 +31,7 @@ export const SiteHeader: Component<Props> = ({state}) => {
             return (<>
                 <p>{state.userLoggedIn()!.username}</p>
                 <a href="/logout" onClick={logoutClickHandler}>Logout</a>
+                <a href="/editor" onClick={(event) => anchorClickHandler(event, "/editor")}>Ny editor</a>;
             </>);
         }
     }
