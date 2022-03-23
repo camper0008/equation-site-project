@@ -21,13 +21,6 @@ pub async fn search(db: web::Data<Mutex<Db>>, title: web::Path<String>) -> impl 
         .await;
 
     if db_result.is_err() {
-        println!(
-            "db err: {}",
-            match db_result.err().unwrap() {
-                DbError::Custom(bruh) => bruh,
-                _ => "unknown".to_string(),
-            }
-        );
         return internal_server_error_response("db error".to_string());
     }
 
