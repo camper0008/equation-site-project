@@ -291,14 +291,14 @@ struct Param {
 
 - Status
 
-`200 OK`
+`200 OK | 400 Bad Request`
 
 - Body
 
 ```rs
 struct Response {
     ok: bool,
-    msg: String, // success | invalid characters
+    msg: String, // success | invalid id
     equation: Equation,
 }
 ```
