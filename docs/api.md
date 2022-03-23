@@ -32,9 +32,11 @@ struct EquationContent {
 
 ```rs
 enum EquationContentType {
-    Image,
+    Title,
     Text,
+    Image,
     Math,
+    Code,
 }
 ```
 
