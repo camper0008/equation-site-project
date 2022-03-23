@@ -2,6 +2,7 @@ import { Logo } from "../components/Logo";
 import { StateManager } from "../StateManager";
 import { Component, createSignal } from "solid-js";
 import { EsParser } from "esdoc";
+import { API_URL, post } from "../api";
 import "../assets/editor_page.scss";
 
 const exampleText = (): string => {
@@ -13,6 +14,8 @@ image""https://upload.wikimedia.org/wikipedia/commons/thumb/d/d8/Example.tiff/lo
 
 Her er noget matematik:
 math""a^2 + b^2 = c^2""
+
+title""Her er en undertitel""
 
 og her er noget kode:
 
@@ -40,6 +43,23 @@ const Editor: Component<Props> = () => {
         setPreviewHtml(doc.toHtml());
     };
 
+    const create = () => {
+        const title = document.getElementById(
+            "equation-title-input",
+        ) as HTMLInputElement;
+        const editor = document.getElementById("editor") as HTMLInputElement;
+
+        const doc = new EsParser(editor.value).parse();
+
+        post(
+            API_URL + "/equations/create",
+            `{
+                "title": "${title.value}",
+                "content": ${doc.toRustJson()}
+            }`,
+        );
+    };
+
     return (
         <>
             <div id="equation-editor-container">
@@ -64,7 +84,7 @@ const Editor: Component<Props> = () => {
                             id="equation-title-input"
                             placeholder="Formel titel"
                         />
-                        <button>Gem formel</button>
+                        <button onClick={create}>Gem formel</button>
                     </div>
                     <div id="preview" innerHTML={previewHtml()}></div>
                 </div>
