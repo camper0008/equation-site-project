@@ -83,7 +83,9 @@ pub struct EquationContent {
 
 #[derive(Serialize, Deserialize, Clone)]
 pub enum EquationContentType {
+    Title,
     Text,
     Image,
     Math,
+    Code,
 }
