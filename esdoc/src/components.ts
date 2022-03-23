@@ -23,7 +23,10 @@ export class EsText implements EsComponent {
     }
 
     public toRustJson(): string {
-        return `{"type":"Text","text":"${this.text.replace(/\n/g, "\\n")}"}`;
+        return `{"content_type":"Text","text":"${this.text.replace(
+            /\n/g,
+            "\\n",
+        )}"}`;
     }
 
     public toMarkdown(): string {
@@ -63,7 +66,7 @@ export class EsImage implements EsComponent {
     }
 
     public toRustJson(): string {
-        return `{"type":"Image","src":"${this.src}","alt":"${this.alt}"}`;
+        return `{"content_type":"Image","src":"${this.src}","alt":"${this.alt}"}`;
     }
 
     public toMarkdown(): string {
@@ -86,7 +89,10 @@ export class EsMath implements EsComponent {
     }
 
     public toRustJson(): string {
-        return `{"type":"Math","value":"${this.latex.replace(/\\/g, "\\\\")}"}`;
+        return `{"content_type":"Math","value":"${this.latex.replace(
+            /\\/g,
+            "\\\\",
+        )}"}`;
     }
 
     public toMarkdown(): string {
@@ -109,9 +115,9 @@ export class EsCode implements EsComponent {
     }
 
     public toRustJson(): string {
-        return `{"type":"Code","lang":"${this.lang}","value":${JSON.stringify(
-            this.code,
-        )}}`;
+        return `{"content_type":"Code","lang":"${
+            this.lang
+        }","value":${JSON.stringify(this.code)}}`;
     }
 
     public toMarkdown(): string {
