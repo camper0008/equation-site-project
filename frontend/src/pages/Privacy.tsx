@@ -1,8 +1,7 @@
 import "../assets/privacy_page.scss";
 
 const Legal = () => {
-    const WEBSITE_NAME = "Formelsamling.dk";
-    const WEBSITE_URL = "https://formelsamling.dk";
+    const WEBSITE_NAME = "Tekniskeformler.dk";
     return (
         <div class="privacy-container clamped-page-view">
             <h1>Privatlivspolitik</h1>

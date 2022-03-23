@@ -69,7 +69,7 @@ export const SiteHeader: Component<Props> = ({ state }) => {
                 class="logo"
                 onClick={(event) => anchorClickHandler(event, "/")}
             >
-                Formelsamling<span class="logo-tld">.dk</span>
+                Tekniskeformler<span class="logo-tld">.dk</span>
             </a>
             {loginOrLogout}
         </nav>

@@ -15,7 +15,7 @@ export const Logo: Component<Props> = ({ state }) => {
     return (
         <h1 class="logo">
             <a href="/" onClick={gotoIndex}>
-                Formelsamling<span class="logo-tld">.dk</span>
+                Tekniskeformler<span class="logo-tld">.dk</span>
             </a>
         </h1>
     );

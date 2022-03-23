@@ -53,10 +53,10 @@ const Editor: Component<Props> = () => {
 
         post(
             API_URL + "/equations/create",
-            `{
-                "title": "${title.value}",
-                "content": ${doc.toRustJson()}
-            }`,
+            JSON.stringify({
+                title: title.value,
+                content: doc.toExportedObject(),
+            }),
         );
     };
 

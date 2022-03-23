@@ -48,7 +48,7 @@ const index = () => {
                     <Match when={pathMatches("/search/:query", path())}>
                         <SearchPage state={state} />
                     </Match>
-                    <Match when={pathMatches("/equation/:id/:title", path())}>
+                    <Match when={pathMatches("/equations/:id/:title", path())}>
                         <Equation state={state} />
                     </Match>
                 </Switch>

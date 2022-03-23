@@ -12,14 +12,14 @@ const sanitizePageTitle = (title: string): string => title.split(" ").join("-");
 export const SearchItem: Component<Props> = ({ state, item }) => {
     const redirect = (event: Event, item: SearchItemProps) => {
         event.preventDefault();
-        state.goto(`/equation/${item.id}/${sanitizePageTitle(item.title)}`);
+        state.goto(`/equations/${item.id}/${sanitizePageTitle(item.title)}`);
     };
 
     return (
         <div class="search-item">
             <h2 class="search-title">{item.title}</h2>
             <a
-                href={`/equation/${item.id}/${sanitizePageTitle(item.title)}`}
+                href={`/equations/${item.id}/${sanitizePageTitle(item.title)}`}
                 class="search-anchor"
                 onClick={(event: Event) => redirect(event, item)}
             >
