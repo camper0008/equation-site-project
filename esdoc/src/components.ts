@@ -3,6 +3,7 @@ import { renderToString } from "katex";
 export interface EsComponent {
     toHtml(): string;
     toJson(): string;
+    toRustJson(): string;
     toMarkdown(): string;
 }
 
@@ -21,6 +22,10 @@ export class EsText implements EsComponent {
         return `{"type":"text","text":"${this.text.replace(/\n/g, "\\n")}"}`;
     }
 
+    public toRustJson(): string {
+        return `{"type":"Text","text":"${this.text.replace(/\n/g, "\\n")}"}`;
+    }
+
     public toMarkdown(): string {
         return this.text;
     }
@@ -34,6 +39,10 @@ export class EsTitle implements EsComponent {
     }
 
     public toJson(): string {
+        return `{"type":"title","text":"${this.text}"}`;
+    }
+
+    public toRustJson(): string {
         return `{"type":"title","text":"${this.text}"}`;
     }
 
@@ -51,6 +60,10 @@ export class EsImage implements EsComponent {
 
     public toJson(): string {
         return `{"type":"image","src":"${this.src}","alt":"${this.alt}"}`;
+    }
+
+    public toRustJson(): string {
+        return `{"type":"Image","src":"${this.src}","alt":"${this.alt}"}`;
     }
 
     public toMarkdown(): string {
@@ -72,6 +85,10 @@ export class EsMath implements EsComponent {
         return `{"type":"math","latex":"${this.latex.replace(/\\/g, "\\\\")}"}`;
     }
 
+    public toRustJson(): string {
+        return `{"type":"Math","value":"${this.latex.replace(/\\/g, "\\\\")}"}`;
+    }
+
     public toMarkdown(): string {
         return this.latex;
     }
@@ -87,6 +104,12 @@ export class EsCode implements EsComponent {
 
     public toJson(): string {
         return `{"type":"code","lang":"${this.lang}","code":${JSON.stringify(
+            this.code,
+        )}}`;
+    }
+
+    public toRustJson(): string {
+        return `{"type":"Code","lang":"${this.lang}","value":${JSON.stringify(
             this.code,
         )}}`;
     }

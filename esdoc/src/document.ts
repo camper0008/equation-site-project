@@ -31,6 +31,28 @@ export type EsJsonifiedComponent =
           code: string;
       };
 
+export type EsRustJsonifiedComponent =
+    | {
+          type: "Text";
+          value: string;
+      }
+    | {
+          type: "Title";
+          value: string;
+      }
+    | {
+          type: "Image";
+          value: string;
+      }
+    | {
+          type: "Math";
+          value: string;
+      }
+    | {
+          type: "Code";
+          value: string;
+      };
+
 export class EsDocument {
     constructor(public components: EsComponent[]) {}
 
@@ -44,6 +66,10 @@ export class EsDocument {
 
     public toJson(): string {
         return `[${this.components.map((c) => c.toJson()).join(",")}]`;
+    }
+
+    public toRustJson(): string {
+        return `[${this.components.map((c) => c.toRustJson()).join(",")}]`;
     }
 
     public toMarkdown(): string {
@@ -65,6 +91,28 @@ export class EsDocument {
                     return new EsMath(c.latex);
                 case "code":
                     return new EsCode(c.code, c.lang);
+            }
+        });
+        return new EsDocument(components);
+    }
+
+    public static fromRustJson(json: string): EsDocument {
+        const safeJson = json.replace(/\n/g, "\\n");
+        const jsonComponents = JSON.parse(
+            safeJson,
+        ) as EsRustJsonifiedComponent[];
+        const components = jsonComponents.map((c) => {
+            switch (c.type) {
+                case "Text":
+                    return new EsText(c.value);
+                case "Title":
+                    return new EsTitle(c.value);
+                case "Image":
+                    return new EsImage(c.value, "");
+                case "Math":
+                    return new EsMath(c.value);
+                case "Code":
+                    return new EsCode(c.value, "");
             }
         });
         return new EsDocument(components);
