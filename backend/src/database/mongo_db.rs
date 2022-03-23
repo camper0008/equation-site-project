@@ -3,7 +3,7 @@ use crate::models::{
     DbEquation, DbSession, DbUser, InsertableDbEquation, InsertableDbSession, InsertableDbUser,
     SessionToken,
 };
-use crate::utils::{gen_random_valid_string, utc_date_iso_string};
+use crate::utils::{gen_8_char_random_valid_string, utc_date_iso_string};
 use futures::stream::StreamExt;
 use mongodb::{bson::doc, options::IndexOptions, Client, Collection, IndexModel};
 use std::future::ready;
@@ -102,7 +102,7 @@ impl MongoDb {
             return Err(DbError::Duplicate);
         };
 
-        let random_id_result = match gen_random_valid_string() {
+        let random_id_result = match gen_8_char_random_valid_string() {
             Ok(random_id) => Ok(random_id),
             Err(_) => Err(DbError::Custom("openssl error".to_string())),
         };
@@ -157,7 +157,7 @@ impl MongoDb {
             return Err(DbError::Duplicate);
         };
 
-        let random_id_result = match gen_random_valid_string() {
+        let random_id_result = match gen_8_char_random_valid_string() {
             Ok(random_id) => Ok(random_id),
             Err(_) => Err(DbError::Custom("openssl error".to_string())),
         };

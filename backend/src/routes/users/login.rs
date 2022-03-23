@@ -1,6 +1,8 @@
 use crate::database::db::Db;
 use crate::models::{GenericResponse, InsertableDbSession};
-use crate::utils::{bad_request_response, gen_random_valid_string, internal_server_error_response};
+use crate::utils::{
+    bad_request_response, gen_64_char_random_valid_string, internal_server_error_response,
+};
 use actix_web::{
     cookie::{time::Duration, Cookie, SameSite},
     http::header::ContentType,
@@ -43,7 +45,7 @@ pub async fn login(db: web::Data<Mutex<Db>>, req: web::Json<LoginRequest>) -> im
         return bad_request_response("invalid login".to_string());
     };
 
-    let random_string_result = gen_random_valid_string();
+    let random_string_result = gen_64_char_random_valid_string();
     if random_string_result.is_err() {
         return internal_server_error_response("openssl error".to_string());
     };

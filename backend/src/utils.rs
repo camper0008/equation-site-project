@@ -44,7 +44,7 @@ fn gen_random_valid_chars() -> Result<[char; 64], GenRandomError> {
     }))
 }
 
-pub fn gen_random_valid_string() -> Result<String, GenRandomError> {
+pub fn gen_64_char_random_valid_string() -> Result<String, GenRandomError> {
     let random_chars_result = gen_random_valid_chars();
     if random_chars_result.is_err() {
         return Err(random_chars_result.err().unwrap());
@@ -54,6 +54,20 @@ pub fn gen_random_valid_string() -> Result<String, GenRandomError> {
         .ok()
         .unwrap()
         .into_iter()
+        .collect::<String>())
+}
+
+pub fn gen_8_char_random_valid_string() -> Result<String, GenRandomError> {
+    let random_chars_result = gen_random_valid_chars();
+    if random_chars_result.is_err() {
+        return Err(random_chars_result.err().unwrap());
+    };
+
+    Ok(random_chars_result
+        .ok()
+        .unwrap()
+        .into_iter()
+        .take(8)
         .collect::<String>())
 }
 
