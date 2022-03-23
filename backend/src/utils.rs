@@ -33,14 +33,14 @@ fn gen_random_valid_chars() -> Result<[char; 64], GenRandomError> {
     // because a u8 goes from 0-255
     const MAX_CHARACTERS: f64 = 255.0;
 
-    const AMOUNT_OF_CHARACTERS: f64 = 62.0;
+    const CHARACTERS_MAX_INDEX: f64 = 61.0;
 
     // this casts the char => u64 => f64, then converts it to a percentage with division and picks
     // from the VALID_CHARACTERS array based on that percentage.
     // this is because rand_bytes literally picks random bytes from 0-255, which sometimes include
     // control characters that are not allowed in headers, leading to an invalid header error
     Ok(token_buffer.map(|n| {
-        VALID_CHARACTERS[(((n as u64 as f64) / MAX_CHARACTERS) * AMOUNT_OF_CHARACTERS) as usize]
+        VALID_CHARACTERS[(((n as u64 as f64) / MAX_CHARACTERS) * CHARACTERS_MAX_INDEX) as usize]
     }))
 }
 
