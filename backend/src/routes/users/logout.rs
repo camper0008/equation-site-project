@@ -1,6 +1,8 @@
-use crate::database::db::{Db, DbError};
+use crate::database::db::Db;
 use crate::models::GenericResponse;
-use crate::utils::{bad_request_response, internal_server_error_response};
+use crate::utils::{
+    bad_request_response, cookie_from_header, internal_server_error_response, CookieHeaderError,
+};
 use actix_web::{
     cookie::Cookie, http::header::ContentType, post, web, HttpRequest, HttpResponse, Responder,
 };
@@ -8,26 +10,26 @@ use std::sync::Mutex;
 
 #[post("/users/logout")]
 pub async fn logout(db: web::Data<Mutex<Db>>, req: HttpRequest) -> impl Responder {
-    let cookie_result = get_cookie_from_header(req.headers());
+    let cookie_result = cookie_from_header(req.headers());
     if cookie_result.is_err() {
         return bad_request_response(match cookie_result.err().unwrap() {
             CookieHeaderError::Malformed => "malformed cookie header".to_string(),
             CookieHeaderError::NotIncluded => "cookie header not included".to_string(),
         });
     };
-    let cookie = cookie_result.unwrap();
+    let cookie = cookie_result.ok().unwrap();
 
     let db_result = (**db)
         .lock()
         .unwrap()
-        .get_session_user_from_token(cookie.value().to_string())
+        .session_user_from_token(cookie.value().to_string())
         .await;
 
     if db_result.is_err() {
         return internal_server_error_response("db error".to_string());
     }
 
-    let found = db_result.unwrap();
+    let found = db_result.ok().unwrap();
     if found.is_none() {
         return bad_request_response("invalid cookie".to_string());
     }
@@ -39,10 +41,7 @@ pub async fn logout(db: web::Data<Mutex<Db>>, req: HttpRequest) -> impl Responde
         .await;
 
     if db_result.is_err() {
-        return internal_server_error_response(match db_result.err().unwrap() {
-            DbError::NotFound => "db error: cookie does not exist".to_string(),
-            _ => "db error".to_string(),
-        });
+        return internal_server_error_response("db error".to_string());
     };
 
     let mut removal_cookie = Cookie::build("SESSION_TOKEN", "").finish();

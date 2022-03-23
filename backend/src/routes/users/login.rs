@@ -21,14 +21,14 @@ pub async fn login(db: web::Data<Mutex<Db>>, req: web::Json<LoginRequest>) -> im
     let result = (**db)
         .lock()
         .unwrap()
-        .get_user_from_name(req.username.clone())
+        .user_from_name(req.username.clone())
         .await;
 
     if result.is_err() {
         return internal_server_error_response("db error".to_string());
     }
 
-    let found = result.unwrap();
+    let found = result.ok().unwrap();
     if found.is_none() {
         return bad_request_response("invalid login".to_string());
     }

@@ -40,6 +40,12 @@ pub struct DbEquation {
     pub creator_id: String,
 }
 
+pub struct InsertableDbEquation {
+    pub title: String,
+    pub content: Vec<EquationContent>,
+    pub creator_id: String,
+}
+
 #[derive(Serialize, Deserialize)]
 pub struct DbSession {
     pub token: SessionToken,
@@ -52,7 +58,7 @@ pub struct InsertableDbSession {
     pub user_id: String,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, PartialEq)]
 pub enum Permission {
     User,
     Contributor,
@@ -76,13 +82,13 @@ pub struct PreviewableEquation {
     date_created: String, // date created as ISO string
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone)]
 pub struct EquationContent {
     content_type: EquationContentType,
     value: String,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone)]
 pub enum EquationContentType {
     Text,
     Image,

@@ -17,14 +17,14 @@ pub async fn create(db: web::Data<Mutex<Db>>, req: web::Json<CreateRequest>) -> 
     let user_get_result = (**db)
         .lock()
         .unwrap()
-        .get_user_from_name(req.username.clone())
+        .user_from_name(req.username.clone())
         .await;
 
     if user_get_result.is_err() {
         return internal_server_error_response("db error".to_string());
     }
 
-    let found = user_get_result.unwrap();
+    let found = user_get_result.ok().unwrap();
     if found.is_some() {
         return bad_request_response("invalid username".to_string());
     };

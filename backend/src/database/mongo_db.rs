@@ -1,6 +1,7 @@
 use crate::database::db::DbError;
 use crate::models::{
-    DbEquation, DbSession, DbUser, InsertableDbSession, InsertableDbUser, SessionToken,
+    DbEquation, DbSession, DbUser, InsertableDbEquation, InsertableDbSession, InsertableDbUser,
+    SessionToken,
 };
 use crate::utils::{gen_random_valid_string, utc_date_iso_string};
 use mongodb::{bson::doc, options::IndexOptions, Client, Collection, IndexModel};
@@ -22,6 +23,34 @@ async fn create_session_expire_index(client: &Client, db_name: &str) {
         .expect("creating an index should succeed");
 }
 
+async fn create_unique_title_index(client: &Client, db_name: &str) {
+    let options = IndexOptions::builder().unique(true).build();
+    let model = IndexModel::builder()
+        .keys(doc! { "title": 1 })
+        .options(options)
+        .build();
+    client
+        .database(db_name)
+        .collection::<DbEquation>("equations")
+        .create_index(model, None)
+        .await
+        .expect("creating an index should succeed");
+}
+
+async fn create_unique_username_index(client: &Client, db_name: &str) {
+    let options = IndexOptions::builder().unique(true).build();
+    let model = IndexModel::builder()
+        .keys(doc! { "username": 1 })
+        .options(options)
+        .build();
+    client
+        .database(db_name)
+        .collection::<DbUser>("users")
+        .create_index(model, None)
+        .await
+        .expect("creating an index should succeed");
+}
+
 #[derive(Clone)]
 pub struct MongoDb {
     client: Client,
@@ -33,6 +62,8 @@ impl MongoDb {
         let client = Client::with_uri_str(uri).await.expect("failed to connect");
 
         create_session_expire_index(&client, &db_name).await;
+        create_unique_title_index(&client, &db_name).await;
+        create_unique_username_index(&client, &db_name).await;
 
         Self {
             client: client,
@@ -77,7 +108,7 @@ impl MongoDb {
             Err(err) => Err(DbError::Custom(err.to_string())),
         }
     }
-    pub async fn get_user_from_name(&self, username: String) -> Result<Option<DbUser>, DbError> {
+    pub async fn user_from_name(&self, username: String) -> Result<Option<DbUser>, DbError> {
         let collection: Collection<DbUser> =
             self.client.database(&self.db_name).collection("users");
         match collection
@@ -89,28 +120,60 @@ impl MongoDb {
             Err(err) => Err(DbError::Custom(err.to_string())),
         }
     }
-    pub async fn get_user_from_id(&self, id: String) -> Result<Option<DbUser>, DbError> {
-        let collection: Collection<DbUser> =
-            self.client.database(&self.db_name).collection("users");
-        match collection.find_one(doc! { "id": id }, None).await {
-            Ok(Some(user)) => Ok(Some(user)),
-            Ok(None) => Ok(None),
-            Err(err) => Err(DbError::Custom(err.to_string())),
-        }
-    }
-    pub async fn add_equation(&mut self, equation: DbEquation) -> Result<(), DbError> {
+    pub async fn add_equation(
+        &mut self,
+        insertable_equation: InsertableDbEquation,
+    ) -> Result<(), DbError> {
         let collection: Collection<DbEquation> =
             self.client.database(&self.db_name).collection("equations");
+        let duplicate_equation_result = match collection
+            .find_one(doc! { "title": &insertable_equation.title.clone() }, None)
+            .await
+        {
+            Ok(Some(equation)) => Ok(Some(equation)),
+            Ok(None) => Ok(None),
+            Err(err) => Err(DbError::Custom(err.to_string())),
+        };
+
+        let duplicate_equation = duplicate_equation_result?;
+        if duplicate_equation.is_some() {
+            return Err(DbError::Duplicate);
+        };
+
+        let random_id_result = match gen_random_valid_string() {
+            Ok(random_id) => Ok(random_id),
+            Err(_) => Err(DbError::Custom("openssl error".to_string())),
+        };
+        let random_id = random_id_result?;
+
+        let equation = DbEquation {
+            id: random_id,
+            title: insertable_equation.title,
+            creator_id: insertable_equation.creator_id,
+            content: insertable_equation.content,
+            date_created: utc_date_iso_string(),
+        };
+
         let result = collection.insert_one(equation, None).await;
+
         match result {
             Ok(_) => Ok(()),
             Err(err) => Err(DbError::Custom(err.to_string())),
         }
     }
-    pub async fn get_equation_from_id(&self, id: String) -> Result<Option<DbEquation>, DbError> {
+    pub async fn equation_from_id(&self, id: String) -> Result<Option<DbEquation>, DbError> {
         let collection: Collection<DbEquation> =
             self.client.database(&self.db_name).collection("equations");
         match collection.find_one(doc! { "id": id }, None).await {
+            Ok(Some(equation)) => Ok(Some(equation)),
+            Ok(None) => Ok(None),
+            Err(err) => Err(DbError::Custom(err.to_string())),
+        }
+    }
+    pub async fn equation_from_title(&self, title: String) -> Result<Option<DbEquation>, DbError> {
+        let collection: Collection<DbEquation> =
+            self.client.database(&self.db_name).collection("equations");
+        match collection.find_one(doc! { "title": title }, None).await {
             Ok(Some(equation)) => Ok(Some(equation)),
             Ok(None) => Ok(None),
             Err(err) => Err(DbError::Custom(err.to_string())),
@@ -135,7 +198,7 @@ impl MongoDb {
             Err(err) => Err(DbError::Custom(err.to_string())),
         }
     }
-    pub async fn get_session_user_from_token(
+    pub async fn session_user_from_token(
         &mut self,
         token: SessionToken,
     ) -> Result<Option<DbUser>, DbError> {
@@ -151,13 +214,10 @@ impl MongoDb {
         };
 
         if session_result.is_err() {
-            return match session_result {
-                Err(err) => Err(DbError::Custom(err.to_string())),
-                _ => Ok(None),
-            };
+            return Err(session_result.err().unwrap());
         };
 
-        let session_or_none = session_result.unwrap();
+        let session_or_none = session_result.ok().unwrap();
         if session_or_none.is_none() {
             return Ok(None);
         };

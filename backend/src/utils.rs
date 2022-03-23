@@ -81,7 +81,7 @@ pub enum CookieHeaderError {
     NotIncluded,
 }
 
-pub fn get_cookie_from_header(headers: &HeaderMap) -> Result<Cookie, CookieHeaderError> {
+pub fn cookie_from_header(headers: &HeaderMap) -> Result<Cookie, CookieHeaderError> {
     let cookie_header_option = headers.get("Cookie");
     if cookie_header_option.is_none() {
         return Err(CookieHeaderError::NotIncluded);
