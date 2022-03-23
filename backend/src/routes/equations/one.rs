@@ -9,7 +9,7 @@ use std::sync::Mutex;
 struct OneResponse {
     ok: bool,
     msg: String,
-    equations: Equation,
+    equation: Equation,
 }
 
 #[get("/equations/one/{post_id}")]
@@ -43,6 +43,6 @@ pub async fn one(db: web::Data<Mutex<Db>>, post_id: web::Path<String>) -> impl R
         .json(OneResponse {
             ok: true,
             msg: "success".to_string(),
-            equations: equation,
+            equation: equation,
         })
 }
