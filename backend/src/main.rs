@@ -28,6 +28,7 @@ async fn main() -> std::io::Result<()> {
             .service(users::create::create)
             .service(users::info::info)
             .service(equations::create::create)
+            .service(equations::search::search)
     })
     .bind(("127.0.0.1", 8080))?
     .run()

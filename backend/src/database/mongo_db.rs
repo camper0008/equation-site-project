@@ -4,7 +4,9 @@ use crate::models::{
     SessionToken,
 };
 use crate::utils::{gen_random_valid_string, utc_date_iso_string};
+use futures::stream::StreamExt;
 use mongodb::{bson::doc, options::IndexOptions, Client, Collection, IndexModel};
+use std::future::ready;
 use std::time::Duration;
 
 async fn create_session_expire_index(client: &Client, db_name: &str) {
@@ -23,16 +25,28 @@ async fn create_session_expire_index(client: &Client, db_name: &str) {
         .expect("creating an index should succeed");
 }
 
-async fn create_unique_title_index(client: &Client, db_name: &str) {
+async fn create_unique_text_title_index(client: &Client, db_name: &str) {
     let options = IndexOptions::builder().unique(true).build();
-    let model = IndexModel::builder()
-        .keys(doc! { "title": 1 })
-        .options(options)
+    let id_model = IndexModel::builder()
+        .keys(doc! { "id": 1 })
+        .options(options.clone())
         .build();
     client
         .database(db_name)
         .collection::<DbEquation>("equations")
-        .create_index(model, None)
+        .create_index(id_model, None)
+        .await
+        .expect("creating an index should succeed");
+
+    let title_model = IndexModel::builder()
+        .keys(doc! { "title": "text" })
+        .options(options)
+        .build();
+
+    client
+        .database(db_name)
+        .collection::<DbEquation>("equations")
+        .create_index(title_model, None)
         .await
         .expect("creating an index should succeed");
 }
@@ -40,7 +54,7 @@ async fn create_unique_title_index(client: &Client, db_name: &str) {
 async fn create_unique_username_index(client: &Client, db_name: &str) {
     let options = IndexOptions::builder().unique(true).build();
     let model = IndexModel::builder()
-        .keys(doc! { "username": 1 })
+        .keys(doc! { "id": 1, "username": 1 })
         .options(options)
         .build();
     client
@@ -62,7 +76,7 @@ impl MongoDb {
         let client = Client::with_uri_str(uri).await.expect("failed to connect");
 
         create_session_expire_index(&client, &db_name).await;
-        create_unique_title_index(&client, &db_name).await;
+        create_unique_text_title_index(&client, &db_name).await;
         create_unique_username_index(&client, &db_name).await;
 
         Self {
@@ -70,6 +84,7 @@ impl MongoDb {
             db_name: db_name,
         }
     }
+
     pub async fn add_user(&mut self, insertable_user: InsertableDbUser) -> Result<(), DbError> {
         let collection: Collection<DbUser> =
             self.client.database(&self.db_name).collection("users");
@@ -108,6 +123,7 @@ impl MongoDb {
             Err(err) => Err(DbError::Custom(err.to_string())),
         }
     }
+
     pub async fn user_from_name(&self, username: String) -> Result<Option<DbUser>, DbError> {
         let collection: Collection<DbUser> =
             self.client.database(&self.db_name).collection("users");
@@ -120,6 +136,7 @@ impl MongoDb {
             Err(err) => Err(DbError::Custom(err.to_string())),
         }
     }
+
     pub async fn add_equation(
         &mut self,
         insertable_equation: InsertableDbEquation,
@@ -161,6 +178,7 @@ impl MongoDb {
             Err(err) => Err(DbError::Custom(err.to_string())),
         }
     }
+
     pub async fn equation_from_id(&self, id: String) -> Result<Option<DbEquation>, DbError> {
         let collection: Collection<DbEquation> =
             self.client.database(&self.db_name).collection("equations");
@@ -170,6 +188,7 @@ impl MongoDb {
             Err(err) => Err(DbError::Custom(err.to_string())),
         }
     }
+
     pub async fn equation_from_title(&self, title: String) -> Result<Option<DbEquation>, DbError> {
         let collection: Collection<DbEquation> =
             self.client.database(&self.db_name).collection("equations");
@@ -179,6 +198,31 @@ impl MongoDb {
             Err(err) => Err(DbError::Custom(err.to_string())),
         }
     }
+
+    pub async fn equation_search(&self, title: String) -> Result<Vec<DbEquation>, DbError> {
+        let collection: Collection<DbEquation> =
+            self.client.database(&self.db_name).collection("equations");
+
+        let result = collection
+            .find(doc! { "$text": {"$search": title} }, None)
+            .await;
+
+        if result.is_err() {
+            return Err(DbError::Custom(result.err().unwrap().to_string()));
+        }
+
+        let cursor = result.ok().unwrap();
+
+        let equations: Vec<DbEquation> = cursor
+            .enumerate()
+            .filter(|(i, _)| ready(*i < 100))
+            .filter_map(|(_, r)| ready(r.ok()))
+            .collect::<Vec<DbEquation>>()
+            .await;
+
+        Ok(equations)
+    }
+
     pub async fn add_session(
         &mut self,
         insertable_session: InsertableDbSession,
@@ -198,6 +242,7 @@ impl MongoDb {
             Err(err) => Err(DbError::Custom(err.to_string())),
         }
     }
+
     pub async fn session_user_from_token(
         &mut self,
         token: SessionToken,
@@ -236,6 +281,7 @@ impl MongoDb {
 
         user_result
     }
+
     pub async fn delete_user_session(
         &mut self,
         token: SessionToken,

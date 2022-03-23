@@ -65,27 +65,20 @@ pub enum Permission {
     Root,
 }
 
-#[derive(Serialize)]
-pub struct Equation {
-    id: String, // randomly generated
-    title: String,
-    content: Vec<EquationContent>,
-    date_created: String, // date created as ISO string
-    creator_id: String,
-}
+pub type Equation = DbEquation;
 
 // a shortened version of Equation to only provide necessary data to preview.
 #[derive(Serialize, Deserialize)]
 pub struct PreviewableEquation {
-    id: String, // same as the full version of the equation
-    title: String,
-    date_created: String, // date created as ISO string
+    pub id: String, // same as the full version of the equation
+    pub title: String,
+    pub date_created: String, // date created as ISO string
 }
 
 #[derive(Serialize, Deserialize, Clone)]
 pub struct EquationContent {
-    content_type: EquationContentType,
-    value: String,
+    pub content_type: EquationContentType,
+    pub value: String,
 }
 
 #[derive(Serialize, Deserialize, Clone)]
