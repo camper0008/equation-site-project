@@ -8,22 +8,14 @@ use std::sync::Mutex;
 
 #[post("/users/logout")]
 pub async fn logout(db: web::Data<Mutex<Db>>, req: HttpRequest) -> impl Responder {
-    let cookie_header_option = req.headers().get("Cookie");
-    if cookie_header_option.is_none() {
-        return bad_request_response("no cookie header included".to_string());
-    }
-
-    let cookie_header_stringify_result = cookie_header_option.unwrap().to_str();
-    if cookie_header_stringify_result.is_err() {
-        return bad_request_response("malformed cookie header".to_string());
-    }
-
-    let cookie_parse_result = Cookie::parse(cookie_header_stringify_result.unwrap());
-    if cookie_parse_result.is_err() {
-        return bad_request_response("malformed cookie header".to_string());
+    let cookie_result = get_cookie_from_header(req.headers());
+    if cookie_result.is_err() {
+        return bad_request_response(match cookie_result.err().unwrap() {
+            CookieHeaderError::Malformed => "malformed cookie header".to_string(),
+            CookieHeaderError::NotIncluded => "cookie header not included".to_string(),
+        });
     };
-
-    let cookie = cookie_parse_result.unwrap();
+    let cookie = cookie_result.unwrap();
 
     let db_result = (**db)
         .lock()
@@ -47,16 +39,10 @@ pub async fn logout(db: web::Data<Mutex<Db>>, req: HttpRequest) -> impl Responde
         .await;
 
     if db_result.is_err() {
-        return internal_server_error_response(
-            (match db_result {
-                Ok(_) => "",
-                Err(err) => match err {
-                    DbError::NotFound => "db error: cookie does not exist",
-                    _ => "db error",
-                },
-            })
-            .to_string(),
-        );
+        return internal_server_error_response(match db_result.err().unwrap() {
+            DbError::NotFound => "db error: cookie does not exist".to_string(),
+            _ => "db error".to_string(),
+        });
     };
 
     let mut removal_cookie = Cookie::build("SESSION_TOKEN", "").finish();

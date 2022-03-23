@@ -1,5 +1,9 @@
 use crate::models::GenericResponse;
-use actix_web::{http::header::ContentType, HttpResponse};
+use actix_web::{
+    cookie::Cookie,
+    http::header::{ContentType, HeaderMap},
+    HttpResponse,
+};
 use chrono::prelude::Utc;
 use openssl::rand::rand_bytes;
 
@@ -70,4 +74,28 @@ pub fn bad_request_response(msg: String) -> HttpResponse {
             ok: false,
             msg: msg,
         })
+}
+
+pub enum CookieHeaderError {
+    Malformed,
+    NotIncluded,
+}
+
+pub fn get_cookie_from_header(headers: &HeaderMap) -> Result<Cookie, CookieHeaderError> {
+    let cookie_header_option = headers.get("Cookie");
+    if cookie_header_option.is_none() {
+        return Err(CookieHeaderError::NotIncluded);
+    }
+
+    let cookie_header_stringify_result = cookie_header_option.unwrap().to_str();
+    if cookie_header_stringify_result.is_err() {
+        return Err(CookieHeaderError::Malformed);
+    }
+
+    let cookie_parse_result = Cookie::parse(cookie_header_stringify_result.unwrap());
+    if cookie_parse_result.is_err() {
+        return Err(CookieHeaderError::Malformed);
+    };
+
+    Ok(cookie_parse_result.unwrap())
 }
