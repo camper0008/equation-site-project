@@ -14,10 +14,16 @@ pub fn utc_date_iso_string() -> String {
 #[derive(Debug)]
 pub enum GenRandomError {
     OpenSSLError,
-    ConversionError,
 }
 
-fn gen_random_valid_bytes() -> Result<[u8; 64], GenRandomError> {
+fn gen_random_valid_chars() -> Result<[char; 64], GenRandomError> {
+    const VALID_CHARACTERS: [char; 62] = [
+        'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r',
+        's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J',
+        'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '0', '1',
+        '2', '3', '4', '5', '6', '7', '8', '9',
+    ];
+
     let mut token_buffer = [0; 64];
     let res = rand_bytes(&mut token_buffer);
     if res.is_err() {
@@ -27,35 +33,28 @@ fn gen_random_valid_bytes() -> Result<[u8; 64], GenRandomError> {
     // because a u8 goes from 0-255
     const MAX_CHARACTERS: f64 = 255.0;
 
-    // because we want from the 62nd ascii character, since 61 is = and that might mess with token
-    // header
-    const CHARACTERS_STARTING_POINT: f64 = 62.0;
+    const AMOUNT_OF_CHARACTERS: f64 = 62.0;
 
-    // because we are picking from characters 62-90 in the ascii table
-    const AMOUNT_OF_CHARACTERS: f64 = 28.0;
-
-    // this casts the u8 => u64 => f64, then converts it to a percentage with division and
-    // then just does a basic clamp function, then casts it back to a u8
+    // this casts the char => u64 => f64, then converts it to a percentage with division and picks
+    // from the VALID_CHARACTERS array based on that percentage.
     // this is because rand_bytes literally picks random bytes from 0-255, which sometimes include
     // control characters that are not allowed in headers, leading to an invalid header error
     Ok(token_buffer.map(|n| {
-        ((((n as u64 as f64) / MAX_CHARACTERS) * AMOUNT_OF_CHARACTERS) + CHARACTERS_STARTING_POINT)
-            as u64 as u8
+        VALID_CHARACTERS[(((n as u64 as f64) / MAX_CHARACTERS) * AMOUNT_OF_CHARACTERS) as usize]
     }))
 }
 
 pub fn gen_random_valid_string() -> Result<String, GenRandomError> {
-    let random_bytes_result = gen_random_valid_bytes();
-    if random_bytes_result.is_err() {
-        return Err(GenRandomError::OpenSSLError);
+    let random_chars_result = gen_random_valid_chars();
+    if random_chars_result.is_err() {
+        return Err(random_chars_result.err().unwrap());
     };
 
-    let random_bytes = random_bytes_result.unwrap().to_vec();
-    let random_string_result = String::from_utf8(random_bytes);
-    match random_string_result {
-        Ok(random_string) => Ok(random_string),
-        Err(_) => Err(GenRandomError::ConversionError),
-    }
+    Ok(random_chars_result
+        .ok()
+        .unwrap()
+        .into_iter()
+        .collect::<String>())
 }
 
 pub fn internal_server_error_response(msg: String) -> HttpResponse {
