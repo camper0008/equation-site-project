@@ -46,7 +46,7 @@ export class EsTitle implements EsComponent {
     }
 
     public toRustJson(): string {
-        return `{"content_type":"title","value":"${this.text}"}`;
+        return `{"content_type":"Title","value":"${this.text}"}`;
     }
 
     public toMarkdown(): string {
