@@ -33,23 +33,23 @@ export type EsJsonifiedComponent =
 
 export type EsRustJsonifiedComponent =
     | {
-          type: "Text";
+          content_type: "Text";
           value: string;
       }
     | {
-          type: "Title";
+          content_type: "Title";
           value: string;
       }
     | {
-          type: "Image";
+          content_type: "Image";
           value: string;
       }
     | {
-          type: "Math";
+          content_type: "Math";
           value: string;
       }
     | {
-          type: "Code";
+          content_type: "Code";
           value: string;
       };
 
@@ -96,13 +96,11 @@ export class EsDocument {
         return new EsDocument(components);
     }
 
-    public static fromRustJson(json: string): EsDocument {
-        const safeJson = json.replace(/\n/g, "\\n");
-        const jsonComponents = JSON.parse(
-            safeJson,
-        ) as EsRustJsonifiedComponent[];
+    public static fromRustComponents(
+        jsonComponents: EsRustJsonifiedComponent[],
+    ): EsDocument {
         const components = jsonComponents.map((c) => {
-            switch (c.type) {
+            switch (c.content_type) {
                 case "Text":
                     return new EsText(c.value);
                 case "Title":
