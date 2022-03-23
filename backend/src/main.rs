@@ -8,6 +8,7 @@ mod models;
 mod routes;
 mod utils;
 
+use crate::routes::equations;
 use crate::routes::users;
 
 #[actix_web::main]
@@ -26,6 +27,7 @@ async fn main() -> std::io::Result<()> {
             .service(users::logout::logout)
             .service(users::create::create)
             .service(users::info::info)
+            .service(equations::create::create)
     })
     .bind(("127.0.0.1", 8080))?
     .run()
