@@ -43,7 +43,6 @@ export const SiteHeader: Component<Props> = ({ state }) => {
                     </a>
                     {(() => {
                         let permission = state.userLoggedIn()!.permission;
-                        console.log(permission);
                         return permission === "Contributor" ||
                             permission === "Root" ? (
                             <a
