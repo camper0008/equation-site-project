@@ -4,6 +4,7 @@
     --clr-dark: #2f2a51;
     --clr-light: #b8d8d8;
     --clr-brand: #665fab;
+    --clr-error: rgb(255, 25, 25);
 
     --ff-body: "Open Sans", sans-serif;
     --ff-brand: "Fredoka", sans-serif;
@@ -34,6 +35,16 @@ a[href] {
 
 button {
     cursor: pointer;
+}
+
+.error {
+    color: var(--clr-error);
+}
+
+.clamped-page-view {
+    max-width: 1000px;
+    margin: auto;
+    padding: 0 max(8vw, 1rem);
 }
 
 :focus-visible {

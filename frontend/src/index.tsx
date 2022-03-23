@@ -16,6 +16,7 @@ const Login = lazy(() => import("./pages/Login"));
 const Register = lazy(() => import("./pages/Register"));
 const Editor = lazy(() => import("./pages/Editor"));
 const Privacy = lazy(() => import("./pages/Privacy"));
+const Equation = lazy(() => import("./pages/Equation"));
 
 const index = () => {
     const [loggedInUser, { mutate, refetch }] = createResource(fetchUserInfo);
@@ -46,6 +47,9 @@ const index = () => {
                     </Match>
                     <Match when={pathMatches("/search/:query", path())}>
                         <SearchPage state={state} />
+                    </Match>
+                    <Match when={pathMatches("/equation/:id/:title", path())}>
+                        <Equation state={state} />
                     </Match>
                 </Switch>
             </div>

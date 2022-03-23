@@ -12,9 +12,10 @@ const isFocused = (target: HTMLInputElement) => {
 interface Props {
     state: StateManager;
     setFocused: Setter<boolean>;
+    refetch?: () => void;
 }
 
-export const SearchBar: Component<Props> = ({ state, setFocused }) => {
+export const SearchBar: Component<Props> = ({ state, setFocused, refetch }) => {
     const handleInputEvent: JSX.EventHandler<
         HTMLInputElement,
         FocusEvent | InputEvent
@@ -40,6 +41,9 @@ export const SearchBar: Component<Props> = ({ state, setFocused }) => {
             const searchbarValue = (event.target as HTMLInputElement).value;
             const encodedValue = encodeURIComponent(searchbarValue);
             state.goto("/search/" + encodedValue);
+            if (refetch) {
+                refetch();
+            }
         }
     };
 

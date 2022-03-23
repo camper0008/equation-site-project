@@ -37,13 +37,20 @@ export interface User {
     date_created: string; // ISO string
 }
 
-interface fetchUserInfoValue {
+interface FetchUserInfoValue {
     value: User | null | undefined;
     refetching?: unknown;
 }
+
+export interface SearchItemProps {
+    id: string;
+    title: string;
+    dateCreated: string;
+}
+
 export async function fetchUserInfo(
     source: User | null,
-    { value, refetching }: fetchUserInfoValue,
+    { value, refetching }: FetchUserInfoValue,
 ) {
     const res = await get(API_URL + "/users/info");
 

@@ -1,10 +1,10 @@
-import "../assets/legal_page.scss";
+import "../assets/privacy_page.scss";
 
 const Legal = () => {
     const WEBSITE_NAME = "Formelsamling.dk";
     const WEBSITE_URL = "https://formelsamling.dk";
     return (
-        <div class="legal-container">
+        <div class="privacy-container clamped-page-view">
             <h1>Privatlivspolitik</h1>
             <p>{WEBSITE_NAME} gemmer følgende data:</p>
             <ul>

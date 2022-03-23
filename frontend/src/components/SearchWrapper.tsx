@@ -22,9 +22,10 @@ const AutoCompleteList = () => {
 interface Props {
     state: StateManager;
     small?: boolean;
+    refetch?: () => void;
 }
 
-export const SearchWrapper: Component<Props> = ({ state, small }) => {
+export const SearchWrapper: Component<Props> = ({ state, small, refetch }) => {
     const [focused, setFocused] = createSignal(false);
 
     return (
@@ -36,7 +37,11 @@ export const SearchWrapper: Component<Props> = ({ state, small }) => {
             }
         >
             <Logo state={state} />
-            <SearchBar state={state} setFocused={setFocused} />
+            <SearchBar
+                state={state}
+                setFocused={setFocused}
+                refetch={refetch}
+            />
             <AutoCompleteList />
         </div>
     );
