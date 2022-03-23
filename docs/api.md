@@ -200,7 +200,7 @@ struct Response {
 }
 ```
 
-### POST `/equations/remove/:post_id:`
+### POST `/equations/remove/{post_id}`
 
 #### Request
 
@@ -233,7 +233,7 @@ struct Response {
 }
 ```
 
-### POST `/equations/edit/:post_id:`
+### POST `/equations/edit/{post_id}`
 
 #### Request
 
@@ -275,7 +275,7 @@ struct Response {
 }
 ```
 
-### GET `/equations/one/:post_id:`
+### GET `/equations/one/{post_id}`
 
 #### Request
 
@@ -303,25 +303,13 @@ struct Response {
 }
 ```
 
-### GET `/equations/all`
-
-#### Response
-
-```rs
-struct Response {
-    ok: bool,
-    msg: String, // success | invalid characters
-    equations: [PreviewableEquation],
-}
-```
-
-### GET `/equations/search/:query`
+### GET `/equations/search/{title}`
 
 - Path Parameters
 
 ```rs
 struct Param {
-    query: String,
+    title: String,
 }
 ```
 
