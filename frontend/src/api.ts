@@ -24,9 +24,9 @@ export const get = async (url: string) => {
 };
 
 export enum Permission {
-    User,
-    Contributor,
-    Root,
+    User = "User",
+    Contributor = "Contributor",
+    Root = "Root",
 }
 
 export interface User {

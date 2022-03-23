@@ -2,7 +2,7 @@ import { StateManager } from "../StateManager";
 import { Component } from "solid-js";
 import "../assets/site-header.scss";
 import "../assets/logo.scss";
-import { API_URL, get, post } from "../api";
+import { API_URL, get, post, Permission } from "../api";
 
 interface Props {
     state: StateManager;
@@ -43,8 +43,8 @@ export const SiteHeader: Component<Props> = ({ state }) => {
                     </a>
                     {(() => {
                         let permission = state.userLoggedIn()!.permission;
-                        return permission === "Contributor" ||
-                            permission === "Root" ? (
+                        return permission === Permission.Contributor ||
+                            permission === Permission.Root ? (
                             <a
                                 href="/editor"
                                 onClick={(event) =>
