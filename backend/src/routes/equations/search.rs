@@ -1,4 +1,4 @@
-use crate::database::db::{Db, DbError};
+use crate::database::db::Db;
 use crate::models::PreviewableEquation;
 use crate::utils::internal_server_error_response;
 use actix_web::{get, http::header::ContentType, web, HttpResponse, Responder};
