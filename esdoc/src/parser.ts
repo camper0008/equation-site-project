@@ -1,11 +1,5 @@
-import {
-    EsCode,
-    EsComponent,
-    EsImage,
-    EsMath,
-    EsText,
-    EsTitle,
-} from "./components";
+import { EsCode, EsImage, EsMath, EsText, EsTitle } from "./components";
+import { EsComponent } from "./models";
 import { EsDocument } from "./document";
 
 export const enum EsParserStates {
@@ -105,7 +99,7 @@ export class EsParser {
             case "title":
                 return new EsTitle(text);
             case "image":
-                return new EsImage(text, "");
+                return new EsImage(text);
             case "math":
                 return new EsMath(text);
             case "code":

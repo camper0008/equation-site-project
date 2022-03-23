@@ -1,127 +1,80 @@
-import { renderToString } from "katex";
+import { render } from "katex";
+import { Component, onMount } from "solid-js";
+import h from "solid-js/h";
 
-export interface EsComponent {
-    toHtml(): string;
-    toJson(): string;
-    toRustJson(): string;
-    toMarkdown(): string;
-}
+import {
+    EsComponent,
+    EsExportedComponent,
+    EsComponentContentType,
+    EsComponentContentValue,
+} from "./models";
 
 export class EsText implements EsComponent {
     constructor(public text: string) {}
 
-    public toHtml(): string {
-        const text = this.text
-            .trim()
-            .replace(/\n[ \t]*\n/, "<br>")
-            .replace(/\s+/g, " ");
-        return /*html*/ `<p class="escomponent estext">${text}</p>`;
+    public toExportedObject(): EsExportedComponent {
+        return { content_type: EsComponentContentType.Text, value: this.text };
     }
 
-    public toJson(): string {
-        return `{"type":"text","text":"${this.text.replace(/\n/g, "\\n")}"}`;
-    }
-
-    public toRustJson(): string {
-        return `{"content_type":"Text","value":"${this.text.replace(
-            /\n/g,
-            "\\n",
-        )}"}`;
-    }
-
-    public toMarkdown(): string {
-        return this.text;
+    public toHyperComponent(): Component {
+        return h("p", this.text);
     }
 }
 
 export class EsTitle implements EsComponent {
     constructor(public text: string) {}
 
-    public toHtml(): string {
-        return /*html*/ `<h2 class="escomponent estitle">${this.text}</h2>`;
+    public toExportedObject(): EsExportedComponent {
+        return { content_type: EsComponentContentType.Title, value: this.text };
     }
 
-    public toJson(): string {
-        return `{"type":"title","text":"${this.text}"}`;
-    }
-
-    public toRustJson(): string {
-        return `{"content_type":"Title","value":"${this.text}"}`;
-    }
-
-    public toMarkdown(): string {
-        return `## ${this.text}`;
+    public toHyperComponent(): Component {
+        return h("h2", this.text);
     }
 }
 
 export class EsImage implements EsComponent {
-    constructor(public src: string, public alt: string) {}
+    constructor(public src: string) {}
 
-    public toHtml(): string {
-        return /*html*/ `<img class="escomponent esimage" src="${this.src}" alt="${this.alt}">`;
+    public toExportedObject(): EsExportedComponent {
+        return { content_type: EsComponentContentType.Image, value: this.src };
     }
 
-    public toJson(): string {
-        return `{"type":"image","src":"${this.src}","alt":"${this.alt}"}`;
-    }
-
-    public toRustJson(): string {
-        return `{"content_type":"Image","value":"${this.src}"}`;
-    }
-
-    public toMarkdown(): string {
-        return `![${this.alt}](${this.src})`;
+    public toHyperComponent(): Component {
+        return h("img", { src: this.src });
     }
 }
 
 export class EsMath implements EsComponent {
     constructor(public latex: string) {}
 
-    public toHtml(): string {
-        return renderToString(this.latex, { throwOnError: true }).replace(
-            '<span class="katex">',
-            '<span class="escomponent esmath katex">',
-        );
+    public toExportedObject(): EsExportedComponent {
+        return { content_type: EsComponentContentType.Math, value: this.latex };
     }
 
-    public toJson(): string {
-        return `{"type":"math","latex":"${this.latex.replace(/\\/g, "\\\\")}"}`;
-    }
+    public toHyperComponent(): Component {
+        let katexRenderReference: HTMLElement;
 
-    public toRustJson(): string {
-        return `{"content_type":"Math","value":"${this.latex.replace(
-            /\\/g,
-            "\\\\",
-        )}"}`;
-    }
+        onMount(() => {
+            render(this.latex, katexRenderReference, {
+                throwOnError: true,
+            });
+        });
 
-    public toMarkdown(): string {
-        return this.latex;
+        return h("div", {
+            ref: (el: HTMLElement) => (katexRenderReference = el),
+        });
     }
 }
 
 export class EsCode implements EsComponent {
-    constructor(public code: string, public lang?: string) {}
+    constructor(public code: string) {}
 
-    public toHtml(): string {
-        const langClass = this.lang ? `lang-${this.lang}` : "";
-        return /*html*/ `<code class="escomponent escode ${langClass}"><pre>${this.code}</pre></code>`;
+    public toExportedObject(): EsExportedComponent {
+        return { content_type: EsComponentContentType.Code, value: this.code };
     }
 
-    public toJson(): string {
-        return `{"type":"code","lang":"${this.lang}","code":${JSON.stringify(
-            this.code,
-        )}}`;
-    }
-
-    public toRustJson(): string {
-        return `{"content_type":"Code", "value":${JSON.stringify(this.code)}}`;
-    }
-
-    public toMarkdown(): string {
-        const backticks = "```";
-        return `${backticks}${
-            this.lang ?? ""
-        }\n${this.code.trim()}\n${backticks}`;
+    public toHyperComponent(): Component {
+        return h("code", h("pre", this.code));
     }
 }

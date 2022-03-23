@@ -30,7 +30,7 @@ interface Props {
 
 const exampleHtml = (): string => {
     const doc = new EsParser(exampleText()).parse();
-    return doc.toHtml();
+    return doc.toHyperComponent();
 };
 
 const Editor: Component<Props> = () => {
@@ -86,7 +86,7 @@ const Editor: Component<Props> = () => {
                         />
                         <button onClick={create}>Gem formel</button>
                     </div>
-                    <div id="preview" innerHTML={previewHtml()}></div>
+                    <div id="preview">{previewHtml()}</div>
                 </div>
             </div>
         </>

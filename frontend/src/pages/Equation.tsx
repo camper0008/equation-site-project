@@ -25,9 +25,9 @@ const Equation: Component<Props> = ({ state }) => {
 
     const parseEquation = () => {
         if (res().ok && res().equation) {
-            return EsDocument.fromRustComponents(
+            return EsDocument.fromExportedComponents(
                 res().equation.content,
-            ).toHtml();
+            ).toHyperComponent();
         }
         return "";
     };
@@ -50,8 +50,7 @@ const Equation: Component<Props> = ({ state }) => {
                     fallback={errorOccurred()}
                 >
                     <h1>{res().equation.title}</h1>
-                    {/* TODO: sanitize input !!! */}
-                    <div innerHTML={parseEquation()} />
+                    <div>{parseEquation()}</div>
                 </Show>
             </Show>
         </article>
