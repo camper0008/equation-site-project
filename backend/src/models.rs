@@ -1,4 +1,5 @@
 use serde::{Deserialize, Serialize};
+use std::string::ToString;
 
 pub type SessionToken = String;
 
@@ -88,4 +89,16 @@ pub enum EquationContentType {
     Image,
     Math,
     Code,
+}
+
+impl ToString for EquationContentType {
+    fn to_string(&self) -> String {
+        match self {
+            EquationContentType::Title => String::from("Title"),
+            EquationContentType::Text => String::from("Text"),
+            EquationContentType::Image => String::from("Image"),
+            EquationContentType::Math => String::from("Math"),
+            EquationContentType::Code => String::from("Code"),
+        }
+    }
 }
