@@ -40,7 +40,7 @@ const Editor: Component<Props> = () => {
         const editor = document.getElementById("editor") as HTMLInputElement;
 
         const doc = new EsParser(editor.value).parse();
-        setPreviewHtml(doc.toHtml());
+        setPreviewHtml(doc.toHyperComponent());
     };
 
     const create = () => {
