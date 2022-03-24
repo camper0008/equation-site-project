@@ -3,7 +3,7 @@ import { StateManager } from "../StateManager";
 import { Component, createSignal } from "solid-js";
 import { EsParser } from "esdoc";
 import { API_URL, post } from "../api";
-import "../assets/editor_page.scss";
+import "../assets/editor-page.scss";
 
 const exampleText = (): string => {
     return `Her vises der noget tekst.

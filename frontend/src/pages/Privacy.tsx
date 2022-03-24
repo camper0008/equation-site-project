@@ -1,4 +1,4 @@
-import "../assets/privacy_page.scss";
+import "../assets/privacy-page.scss";
 
 const Legal = () => {
     const WEBSITE_NAME = "Tekniskeformler.dk";
