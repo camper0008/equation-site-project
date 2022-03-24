@@ -11,14 +11,23 @@ const Legal = () => {
                     Ved registrering:{" "}
                     <ul>
                         <li>
-                            Brugernavn og Hashed<sup>1</sup> password
+                            Brugernavn og Hashed
+                            <sup>
+                                <a href="#footnote-1">1</a>
+                            </sup>{" "}
+                            password
                         </li>
                         <li>
                             Tilfældigt genereret identifikationsnummer
-                            <sup>2</sup>
+                            <sup>
+                                <a href="#footnote-2">2</a>
+                            </sup>
                         </li>
                         <li>
-                            Bruger adgangsniveau<sup>3</sup>
+                            Bruger adgangsniveau
+                            <sup>
+                                <a href="#footnote-3">3</a>
+                            </sup>
                         </li>
                         <li>Dato, som konto bliver skabt</li>
                     </ul>
@@ -27,9 +36,13 @@ const Legal = () => {
                     Ved login:{" "}
                     <ul>
                         <li>
-                            En cookie<sup>4</sup>, der dikterer din nuværende
-                            session. Den opbevares sammen med reference til dit
-                            bruger identifikationsnummer.
+                            En cookie
+                            <sup>
+                                <a href="#footnote-4">4</a>
+                            </sup>
+                            , der dikterer din nuværende session. Den opbevares
+                            sammen med reference til dit bruger
+                            identifikationsnummer.
                         </li>
                     </ul>
                 </li>
@@ -56,7 +69,7 @@ const Legal = () => {
             </a>
             .<h2>Fodnoter</h2>
             <ol>
-                <li>
+                <li id="footnote-1">
                     Et "hashed" password, er per definition etvejs, og det er
                     derfor umuligt et password ud fra det. Mere information kan
                     findes her:{" "}
@@ -67,12 +80,14 @@ const Legal = () => {
                         Hash function - Wikipedia
                     </a>
                 </li>
-                <li>Dette bruges for standard funktionalitet</li>
-                <li>
+                <li id="footnote-2">
+                    Dette bruges for standard funktionalitet
+                </li>
+                <li id="footnote-3">
                     Adgangsniveau dikterer, om du har rettigheder til at f.eks.
                     skabe formler, på siden.
                 </li>
-                <li>
+                <li id="footnote-4">
                     En cookie er en lille fil, der holder på noget data. Din
                     SESSION_ID cookie holder på et tilfældigt generet
                     identifikationsnummer, for din session.
