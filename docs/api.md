@@ -163,7 +163,7 @@ struct Response {
 ```rs
 struct Response {
     ok: bool,
-    msg: String, // success | unauthorized
+    msg: String, // success | invalid cookie | malformed cookie header | cookie header not included
     user: Option<User>
 }
 ```
@@ -198,7 +198,7 @@ struct Request {
 ```rs
 struct Response {
     ok: bool,
-    msg: String, // success | unauthorized
+    msg: String, // success | unauthorized | invalid cookie
 }
 ```
 
@@ -231,7 +231,7 @@ struct Param {
 ```rs
 struct Response {
     ok: bool,
-    msg: String, // success | unauthorized
+    msg: String, // success | unauthorized | invalid cookie
 }
 ```
 
@@ -273,7 +273,7 @@ struct Request {
 ```rs
 struct Response {
     ok: bool,
-    msg: String, // success | unauthorized
+    msg: String, // success | unauthorized | invalid cookie
 }
 ```
 
