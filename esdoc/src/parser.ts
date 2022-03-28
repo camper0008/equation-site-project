@@ -42,6 +42,8 @@ export class EsParser {
         if (/[a-zA-Z]/.test(char)) {
             if (!this.lastCharWasWordChar) this.lastWord = "";
             this.lastWord += char;
+            if (this.lastWord.length > 1000)
+                this.lastWord = this.lastWord.at(-1);
             this.lastCharWasWordChar = true;
         } else {
             this.lastCharWasWordChar = false;
