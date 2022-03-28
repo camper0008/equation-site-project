@@ -39,7 +39,7 @@ export const SiteHeader: Component<Props> = ({ state }) => {
                         Logout
                     </a>
                     {(() => {
-                        let permission = state.userLoggedIn()!.permission;
+                        const permission = state.userLoggedIn()!.permission;
                         return permission === Permission.Contributor ||
                             permission === Permission.Root ? (
                             <a

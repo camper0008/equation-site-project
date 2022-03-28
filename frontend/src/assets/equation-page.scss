@@ -11,4 +11,11 @@
         padding: 1rem;
         border-radius: 0.325rem;
     }
+    .edit-button {
+        background-color: var(--clr-brand);
+        padding: 0.5em;
+        border-radius: 0.325rem;
+        color: var(--clr-light);
+        font-weight: bold;
+    }
 }
