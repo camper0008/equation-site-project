@@ -1,11 +1,11 @@
 use crate::database::db::DbError;
 use crate::models::{
-    DbEquation, DbSession, DbUser, EquationContent, InsertableDbEquation, InsertableDbSession,
-    InsertableDbUser, SessionToken,
+    DbEquation, DbSession, DbUser, InsertableDbEquation, InsertableDbSession, InsertableDbUser,
+    SessionToken,
 };
 use crate::utils::{gen_8_char_random_valid_string, utc_date_iso_string};
 use futures::stream::StreamExt;
-use mongodb::{bson::doc, bson::Bson, options::IndexOptions, Client, Collection, IndexModel};
+use mongodb::{bson::doc, options::IndexOptions, Client, Collection, IndexModel};
 use std::convert::From;
 use std::future::ready;
 use std::time::Duration;
@@ -187,7 +187,8 @@ impl MongoDb {
     ) -> Result<(), DbError> {
         let collection: Collection<DbEquation> =
             self.client.database(&self.db_name).collection("equations");
-        let duplicate_equation_result = match collection
+
+        let duplicate_title_result = match collection
             .find_one(doc! { "title": &insertable_equation.title.clone() }, None)
             .await
         {
@@ -196,14 +197,25 @@ impl MongoDb {
             Err(err) => Err(DbError::Custom(err.to_string())),
         };
 
-        let found_equation_option = duplicate_equation_result?;
-        match found_equation_option {
-            Some(ref equation) => {
-                if equation.id != post_id {
-                    return Err(DbError::Duplicate);
-                }
-            }
-            None => return Err(DbError::NotFound),
+        let duplicate_title_option = duplicate_title_result?;
+        if duplicate_title_option.is_some() {
+            if duplicate_title_option.unwrap().id != post_id {
+                return Err(DbError::Duplicate);
+            };
+        };
+
+        let existing_post_result = match collection
+            .find_one(doc! { "id": &post_id.clone() }, None)
+            .await
+        {
+            Ok(Some(equation)) => Ok(Some(equation)),
+            Ok(None) => Ok(None),
+            Err(err) => Err(DbError::Custom(err.to_string())),
+        };
+
+        let existing_id_option = existing_post_result?;
+        if existing_id_option.is_none() {
+            return Err(DbError::NotFound);
         };
 
         let result = collection
@@ -212,8 +224,10 @@ impl MongoDb {
                     "id": post_id
                 },
                 doc! {
-                    "title": insertable_equation.title,
-                    "content": insertable_equation.content,
+                    "$set": {
+                        "title": insertable_equation.title,
+                        "content": insertable_equation.content,
+                    },
                 },
                 None,
             )
@@ -342,14 +356,5 @@ impl MongoDb {
             Ok(None) => Ok(None),
             Err(err) => Err(DbError::Custom(err.to_string())),
         }
-    }
-}
-
-impl From<EquationContent> for Bson {
-    fn from(ec: EquationContent) -> Self {
-        Bson::Document(doc! {
-            "value": Bson::String(ec.value),
-                "content_type" : Bson::String(ec.content_type.to_string()),
-        })
     }
 }

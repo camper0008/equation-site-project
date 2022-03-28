@@ -8,7 +8,7 @@
 struct Equation {
     id: String // randomly generated
     title: String,
-    content: [EquationContent],
+    content: String,
     date_created: String, // date created as ISO string
     creator: User,
 }
@@ -20,23 +20,6 @@ struct PreviewableEquation {
     id: String // same id as the full equation
     title: String,
     date_created: String, // date created as ISO string
-}
-```
-
-```rs
-struct EquationContent {
-    content_type: EquationContentType,
-    value: String,
-}
-```
-
-```rs
-enum EquationContentType {
-    Title,
-    Text,
-    Image,
-    Math,
-    Code,
 }
 ```
 
@@ -183,7 +166,7 @@ struct Response {
 ```rs
 struct Request {
     title: String,
-    content: [EquationContent],
+    content: String,
 }
 ```
 
@@ -258,7 +241,7 @@ struct Param {
 ```rs
 struct Request {
     title: String,
-    content: [EquationContent],
+    content: String,
 }
 ```
 

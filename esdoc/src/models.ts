@@ -10,12 +10,6 @@ export enum EsComponentContentType {
 
 export type EsComponentContentValue = string;
 
-export interface EsExportedComponent {
-    content_type: EsComponentContentType;
-    value: EsComponentContentValue;
-}
-
 export interface EsComponent {
-    toExportedObject(): EsExportedComponent;
     toHyperComponent(): Component;
 }

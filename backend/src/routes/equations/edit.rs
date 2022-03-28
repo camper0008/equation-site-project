@@ -1,5 +1,5 @@
 use crate::database::db::{Db, DbError};
-use crate::models::{EquationContent, GenericResponse, InsertableDbEquation, Permission};
+use crate::models::{GenericResponse, InsertableDbEquation, Permission};
 use crate::utils::{
     bad_request_response, cookie_from_header, internal_server_error_response, CookieHeaderError,
 };
@@ -10,7 +10,7 @@ use std::sync::Mutex;
 #[derive(Deserialize)]
 pub struct EditRequest {
     title: String,
-    content: Vec<EquationContent>,
+    content: String,
 }
 
 #[post("/equations/edit/{post_id}")]

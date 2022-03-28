@@ -1,6 +1,6 @@
 {
     "name": "esdoc",
-    "version": "1.0.3",
+    "version": "1.0.4",
     "description": "Equation-site document parser and generator",
     "main": "dist/main.js",
     "repository": "https://github.com/camper0008/equation-site-project.git",
