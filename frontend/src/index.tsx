@@ -39,7 +39,7 @@ const index = () => {
                     <Match when={pathMatches("/register", path())}>
                         <Register state={state} />
                     </Match>
-                    <Match when={pathMatches("/editor", path())}>
+                    <Match when={pathMatches("/editor/:id", path())}>
                         <Editor state={state} />
                     </Match>
                     <Match when={pathMatches("/privacy", path())}>

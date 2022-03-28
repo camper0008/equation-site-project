@@ -1,11 +1,18 @@
 import { Logo } from "../components/Logo";
 import { StateManager } from "../StateManager";
-import { Component, createSignal } from "solid-js";
-import { EsParser } from "esdoc";
-import { API_URL, post } from "../api";
+import {
+    Component,
+    createSignal,
+    createEffect,
+    createResource,
+    onMount,
+} from "solid-js";
+import { EsParser, EsDocument } from "esdoc";
+import { API_URL, post, get } from "../api";
+import { urlParams } from "../utils";
 import "../assets/editor-page.scss";
 
-const exampleText = (): string => {
+const defaultText = (): string => {
     return `Her vises der noget tekst.
 
 Dette er et billede:
@@ -28,68 +35,116 @@ interface Props {
     state: StateManager;
 }
 
-const exampleHtml = (): string => {
-    const doc = new EsParser(exampleText()).parse();
-    return doc.toHyperComponent();
-};
+interface Post {
+    id: string | null;
+    title: string;
+    content: string;
+}
 
-const Editor: Component<Props> = () => {
-    const [previewHtml, setPreviewHtml] = createSignal(exampleHtml());
+const Editor: Component<Props> = ({ state }) => {
+    let titleElement: HTMLInputElement;
+    let editorElement: HTMLInputElement;
+    const [previewHtml, setPreviewHtml] = createSignal(<></>);
 
     const parse = () => {
-        const editor = document.getElementById("editor") as HTMLInputElement;
-
-        const doc = new EsParser(editor.value).parse();
+        const doc = new EsParser(editorElement!.value).parse();
         setPreviewHtml(doc.toHyperComponent());
     };
 
-    const create = () => {
-        const title = document.getElementById(
-            "equation-title-input",
-        ) as HTMLInputElement;
-        const editor = document.getElementById("editor") as HTMLInputElement;
+    const fetchData = async (): Promise<Post> => {
+        if (state.path() === "/editor/new") {
+            return {
+                id: null,
+                title: "",
+                content: defaultText(),
+            };
+        }
 
-        const doc = new EsParser(editor.value).parse();
+        const { id } = urlParams("/editor/:id", state.path());
+        const res = await get(API_URL + `/equations/one/${id}`);
+
+        if (res.ok && res.equation) {
+            const { title, content } = res.equation;
+            return {
+                id,
+                title,
+                content,
+            };
+        }
+
+        return {
+            id: null,
+            title: "",
+            content: defaultText(),
+        };
+    };
+
+    const [existingEquation] = createResource(fetchData);
+
+    const saveEquation = () => {
+        let endpoint = "";
+        if (state.path() === "/editor/new") {
+            endpoint = "/equations/create";
+        } else {
+            const { id } = urlParams("/editor/:id", state.path());
+            endpoint = `/equations/edit/${id}`;
+        }
 
         post(
-            API_URL + "/equations/create",
+            API_URL + endpoint,
             JSON.stringify({
-                title: title.value,
-                content: doc.toExportedObject(),
+                title: titleElement!.value,
+                content: editorElement!.value,
             }),
         );
     };
 
+    createEffect(() => {
+        existingEquation();
+        parse();
+    });
+
     return (
-        <>
-            <div id="equation-editor-container">
-                <div id="editor-container">
-                    <h2>Redigering</h2>
-                    <div class="equation-toolbar">
-                        <p>Objektindsætter</p>
-                        <button data-object-type="math">Matematik</button>
-                        <button data-object-type="image">Billede</button>
-                        <button data-object-type="code">Kode</button>
-                    </div>
-                    <textarea id="editor" onInput={parse}>
-                        {exampleText()}
-                    </textarea>
+        <div id="equation-editor-container">
+            <div id="editor-container">
+                <h2>Redigering</h2>
+                <div class="equation-toolbar">
+                    <p>Objektindsætter</p>
+                    <button>Test</button>
                 </div>
-                <div id="preview-container">
-                    <h2>Forhåndsvisning</h2>
-                    <div class="equation-toolbar">
-                        <p>Formelindstillinger</p>
-                        <label for="equation-title-input">Titel:</label>
-                        <input
-                            id="equation-title-input"
-                            placeholder="Formel titel"
-                        />
-                        <button onClick={create}>Gem formel</button>
-                    </div>
-                    <div id="preview">{previewHtml()}</div>
-                </div>
+                <textarea
+                    id="editor"
+                    onInput={parse}
+                    ref={editorElement}
+                    disabled={
+                        existingEquation.loading || existingEquation.error
+                    }
+                >
+                    {!existingEquation.loading
+                        ? existingEquation().content
+                        : ""}
+                </textarea>
             </div>
-        </>
+            <div id="preview-container">
+                <h2>Forhåndsvisning</h2>
+                <div class="equation-toolbar">
+                    <p>Formelindstillinger</p>
+                    <label for="equation-title-input">Titel:</label>
+                    <input
+                        id="equation-title-input"
+                        placeholder="Formel titel"
+                        value={
+                            !existingEquation.loading
+                                ? existingEquation().title
+                                : ""
+                        }
+                        ref={titleElement}
+                    />
+                    <button onClick={saveEquation}>Gem formel</button>
+                </div>
+                <div id="preview">{previewHtml()}</div>
+            </div>
+        </div>
     );
 };
 

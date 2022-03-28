@@ -1,9 +1,9 @@
-import { Component, createResource, createEffect } from "solid-js";
+import { Component, createResource, createEffect, Show } from "solid-js";
 import { API_URL, get } from "../api";
 import { StateManager } from "../StateManager";
 import { urlParams } from "../utils";
 import "../assets/equation-page.scss";
-import { EsDocument } from "esdoc";
+import { EsParser } from "esdoc";
 
 interface Props {
     state: StateManager;
@@ -25,9 +25,9 @@ const Equation: Component<Props> = ({ state }) => {
 
     const parseEquation = () => {
         if (res().ok && res().equation) {
-            return EsDocument.fromExportedComponents(
-                res().equation.content,
-            ).toHyperComponent();
+            const parser = new EsParser(res().equation.content);
+            const doc = parser.parse();
+            return doc.toHyperComponent();
         }
         return "";
     };

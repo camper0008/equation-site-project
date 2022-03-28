@@ -3,10 +3,6 @@
     flex-direction: column;
 }
 
-.page-container {
-    display: flex;
-}
-
 .equation-toolbar {
     display: flex;
     align-items: center;
@@ -43,7 +39,6 @@
 
 #equation-editor-container {
     display: flex;
-    flex: 1;
 
     h2 {
         padding: 0 1rem;

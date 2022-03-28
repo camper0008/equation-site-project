@@ -18,7 +18,7 @@ export const SiteHeader: Component<Props> = ({ state }) => {
         state.refetchUserLoggedIn();
     };
 
-    const anchorClickHandler = (event: Event, path: string) => {
+    const redirect = (event: Event, path: string) => {
         event.preventDefault();
         state.goto(path);
     };
@@ -27,10 +27,7 @@ export const SiteHeader: Component<Props> = ({ state }) => {
         const userState = state.userLoggedIn();
         if (userState === null || userState === undefined) {
             return (
-                <a
-                    href="/login"
-                    onClick={(event) => anchorClickHandler(event, "/login")}
-                >
+                <a href="/login" onClick={(event) => redirect(event, "/login")}>
                     Login
                 </a>
             );
@@ -46,9 +43,9 @@ export const SiteHeader: Component<Props> = ({ state }) => {
                         return permission === Permission.Contributor ||
                             permission === Permission.Root ? (
                             <a
-                                href="/editor"
+                                href="/editor/new"
                                 onClick={(event) =>
-                                    anchorClickHandler(event, "/editor")
+                                    redirect(event, "/editor/new")
                                 }
                             >
                                 Ny formel
@@ -64,11 +61,7 @@ export const SiteHeader: Component<Props> = ({ state }) => {
 
     return (
         <nav class="main-nav">
-            <a
-                href="/"
-                class="logo"
-                onClick={(event) => anchorClickHandler(event, "/")}
-            >
+            <a href="/" class="logo" onClick={(event) => redirect(event, "/")}>
                 Tekniskeformler<span class="logo-tld">.dk</span>
             </a>
             {loginOrLogout}
