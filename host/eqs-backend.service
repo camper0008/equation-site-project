@@ -1,0 +1,11 @@
+[Unit]
+Description=equation site backend service
+[Service]
+Type=simple
+User=host
+WorkingDirectory=/home/host/
+ExecStart=/home/host/equation-site-backend
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target
