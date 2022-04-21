@@ -1,7 +1,9 @@
-import { env } from "process";
-
 export const apiUrl = (): string => {
-    return env["API_URL"] ?? "";
+    if (window.location.hostname === "localhost") {
+        return "http://localhost:8080/"
+    } else {
+        return "/api"
+    }
 }
 
 type body = BodyInit | null | undefined;

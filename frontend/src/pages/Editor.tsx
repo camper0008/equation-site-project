@@ -1,11 +1,9 @@
-import { Logo } from "../components/Logo";
 import { StateManager } from "../StateManager";
 import {
     Component,
     createSignal,
     createEffect,
     createResource,
-    onMount,
 } from "solid-js";
 import { EsParser, EsDocument } from "esdoc";
 import { apiUrl, post, get } from "../api";

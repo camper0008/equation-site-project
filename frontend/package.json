@@ -3,7 +3,6 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "dotenv": "^16.0.0",
     "esdoc": "file:../esdoc"
   },
   "devDependencies": {
