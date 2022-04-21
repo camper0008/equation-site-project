@@ -43,7 +43,7 @@ export class EsParser {
             if (!this.lastCharWasWordChar) this.lastWord = "";
             this.lastWord += char;
             if (this.lastWord.length > 1000)
-                this.lastWord = this.lastWord.at(-1);
+                this.lastWord = this.lastWord[this.lastWord.length-1];
             this.lastCharWasWordChar = true;
         } else {
             this.lastCharWasWordChar = false;

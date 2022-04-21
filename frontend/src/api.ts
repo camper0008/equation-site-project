@@ -1,4 +1,8 @@
-export const API_URL = "/api";
+import { env } from "process";
+
+export const apiUrl = (): string => {
+    return env["API_URL"] ?? "";
+}
 
 type body = BodyInit | null | undefined;
 
@@ -52,7 +56,7 @@ export async function fetchUserInfo(
     source: User | null,
     { value, refetching }: FetchUserInfoValue,
 ) {
-    const res = await get(API_URL + "/users/info");
+    const res = await get(apiUrl() + "/users/info");
 
     if (res.ok) {
         return res.user;

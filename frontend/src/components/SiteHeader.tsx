@@ -2,7 +2,7 @@ import { StateManager } from "../StateManager";
 import { Component } from "solid-js";
 import "../assets/site-header.scss";
 import "../assets/logo.scss";
-import { API_URL, get, post, Permission } from "../api";
+import { apiUrl, post, Permission } from "../api";
 
 interface Props {
     state: StateManager;
@@ -11,7 +11,7 @@ interface Props {
 export const SiteHeader: Component<Props> = ({ state }) => {
     const logoutClickHandler = async (event: Event) => {
         event.preventDefault();
-        const res = await post(API_URL + "/users/logout", null);
+        const res = await post(apiUrl() + "/users/logout", null);
         if (!res.ok) {
             console.error(`an error occured trying to log out: ${res.msg}`);
         }

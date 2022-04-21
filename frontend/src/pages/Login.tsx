@@ -2,7 +2,7 @@ import { Logo } from "../components/Logo";
 import { Component, createSignal } from "solid-js";
 import { StateManager } from "../StateManager";
 import "../assets/form.scss";
-import { API_URL, post } from "../api";
+import { apiUrl, post } from "../api";
 
 interface Props {
     state: StateManager;
@@ -64,7 +64,7 @@ const Login: Component<Props> = ({ state }) => {
             password: passwordElement.value,
         });
 
-        let res = await post(API_URL + "/users/login", body);
+        let res = await post(apiUrl() + "/users/login", body);
 
         setFetching(false);
 

@@ -1,5 +1,5 @@
 import { Component, createResource, createEffect, Show } from "solid-js";
-import { API_URL, get, Permission } from "../api";
+import { apiUrl, get, Permission } from "../api";
 import { StateManager } from "../StateManager";
 import { urlParams } from "../utils";
 import "../assets/equation-page.scss";
@@ -48,7 +48,7 @@ const Equation: Component<Props> = ({ state }) => {
 
     const fetchData = async () => {
         const { id } = urlParams("/equations/:id/:title", state.path());
-        const res = await get(API_URL + `/equations/one/${id}`);
+        const res = await get(apiUrl() + `/equations/one/${id}`);
 
         return res;
     };
@@ -83,7 +83,7 @@ const Equation: Component<Props> = ({ state }) => {
                     fallback={errorOccurred()}
                 >
                     <h1>{res().equation.title}</h1>
-                    <div>{parseEquation()}</div>
+                    <div>{parseEquation() as unknown as string}</div>
                 </Show>
             </Show>
         </article>

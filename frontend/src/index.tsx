@@ -7,7 +7,8 @@ import { pathMatches } from "./utils";
 import { StateManager } from "./StateManager";
 import { SiteHeader } from "./components/SiteHeader";
 import { Footer } from "./components/Footer";
-import { User, fetchUserInfo } from "./api";
+import { fetchUserInfo } from "./api";
+import * as dotenv from "dotenv";
 
 const NotFound = lazy(() => import("./pages/NotFound"));
 const Home = lazy(() => import("./pages/Home"));
@@ -19,6 +20,8 @@ const Privacy = lazy(() => import("./pages/Privacy"));
 const Equation = lazy(() => import("./pages/Equation"));
 
 const index = () => {
+    dotenv.config();
+
     const [loggedInUser, { mutate, refetch }] = createResource(fetchUserInfo);
 
     const [path, setPath] = createSignal(window.location.pathname);

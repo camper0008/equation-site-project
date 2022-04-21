@@ -3,7 +3,7 @@ import { SearchWrapper } from "../components/SearchWrapper";
 import { SearchItem } from "../components/SearchItem";
 import { StateManager } from "../StateManager";
 import { urlParams } from "../utils";
-import { get, API_URL, SearchItemProps } from "../api";
+import { get, apiUrl, SearchItemProps } from "../api";
 import "../assets/search-item.scss";
 
 interface Props {
@@ -13,7 +13,7 @@ interface Props {
 const SearchPage: Component<Props> = ({ state }) => {
     const fetchData = async () => {
         const { query } = urlParams("/search/:query", state.path());
-        const res = await get(API_URL + `/equations/search/${query}`);
+        const res = await get(apiUrl() + `/equations/search/${query}`);
 
         return res;
     };

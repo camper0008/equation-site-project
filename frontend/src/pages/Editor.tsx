@@ -8,7 +8,7 @@ import {
     onMount,
 } from "solid-js";
 import { EsParser, EsDocument } from "esdoc";
-import { API_URL, post, get } from "../api";
+import { apiUrl, post, get } from "../api";
 import { urlParams } from "../utils";
 import "../assets/editor-page.scss";
 
@@ -43,12 +43,12 @@ interface Post {
 
 const Editor: Component<Props> = ({ state }) => {
     let titleElement: HTMLInputElement;
-    let editorElement: HTMLInputElement;
+    let editorElement: HTMLTextAreaElement;
     const [previewHtml, setPreviewHtml] = createSignal(<></>);
 
     const parse = () => {
         const doc = new EsParser(editorElement!.value).parse();
-        setPreviewHtml(doc.toHyperComponent());
+        setPreviewHtml(doc.toHyperComponent() as unknown as string);
     };
 
     const fetchData = async (): Promise<Post> => {
@@ -61,7 +61,7 @@ const Editor: Component<Props> = ({ state }) => {
         }
 
         const { id } = urlParams("/editor/:id", state.path());
-        const res = await get(API_URL + `/equations/one/${id}`);
+        const res = await get(apiUrl() + `/equations/one/${id}`);
 
         if (res.ok && res.equation) {
             const { title, content } = res.equation;
@@ -91,7 +91,7 @@ const Editor: Component<Props> = ({ state }) => {
         }
 
         post(
-            API_URL + endpoint,
+            apiUrl() + endpoint,
             JSON.stringify({
                 title: titleElement!.value,
                 content: editorElement!.value,
@@ -115,13 +115,13 @@ const Editor: Component<Props> = ({ state }) => {
                 <textarea
                     id="editor"
                     onInput={parse}
-                    ref={editorElement}
+                    ref={editorElement!}
                     disabled={
                         existingEquation.loading || existingEquation.error
                     }
                 >
                     {!existingEquation.loading
-                        ? existingEquation().content
+                        ? existingEquation()?.content
                         : ""}
                 </textarea>
             </div>
@@ -135,10 +135,10 @@ const Editor: Component<Props> = ({ state }) => {
                         placeholder="Formel titel"
                         value={
                             !existingEquation.loading
-                                ? existingEquation().title
+                                ? existingEquation()?.title
                                 : ""
                         }
-                        ref={titleElement}
+                        ref={titleElement!}
                     />
                     <button onClick={saveEquation}>Gem formel</button>
                 </div>
