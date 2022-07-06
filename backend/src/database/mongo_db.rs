@@ -1,13 +1,14 @@
 use crate::database::db::DbError;
 use crate::models::{
     DbEquation, DbSession, DbUser, InsertableDbEquation, InsertableDbSession, InsertableDbUser,
-    SessionToken,
+    PreviewableEquation, SessionToken,
 };
 use crate::utils::{gen_8_char_random_valid_string, utc_date_iso_string};
-use futures::stream::StreamExt;
-use mongodb::{bson::doc, options::IndexOptions, Client, Collection, IndexModel};
+use futures::TryStreamExt;
+use mongodb::{
+    bson::doc, options::FindOptions, options::IndexOptions, Client, Collection, IndexModel,
+};
 use std::convert::From;
-use std::future::ready;
 use std::time::Duration;
 
 async fn create_session_expire_index(client: &Client, db_name: &str) {
@@ -259,28 +260,21 @@ impl MongoDb {
         }
     }
 
-    pub async fn equation_search(&self, title: String) -> Result<Vec<DbEquation>, DbError> {
-        let collection: Collection<DbEquation> =
-            self.client.database(&self.db_name).collection("equations");
-
-        let result = collection
-            .find(doc! { "$text": {"$search": title} }, None)
-            .await;
-
-        if result.is_err() {
-            return Err(DbError::Custom(result.err().unwrap().to_string()));
-        }
-
-        let cursor = result.ok().unwrap();
-
-        let equations: Vec<DbEquation> = cursor
-            .enumerate()
-            .filter(|(i, _)| ready(*i < 100))
-            .filter_map(|(_, r)| ready(r.ok()))
-            .collect::<Vec<DbEquation>>()
-            .await;
-
-        Ok(equations)
+    pub async fn all_titles(&self) -> Result<Vec<PreviewableEquation>, DbError> {
+        self.client
+            .database(&self.db_name)
+            .collection("equations")
+            .find(
+                doc! {},
+                FindOptions::builder()
+                    .projection(doc! {"id": 1u32, "title": 1u32, "date_created": 1u32})
+                    .build(),
+            )
+            .await
+            .map_err(|e| DbError::Custom(format!("title recieving error, {}", e)))?
+            .try_collect()
+            .await
+            .map_err(|_| DbError::Custom("title collection error".to_string()))
     }
 
     pub async fn add_session(

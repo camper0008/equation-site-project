@@ -1,5 +1,6 @@
 use crate::database::mongo_db::MongoDb;
 
+#[derive(Debug)]
 pub enum DbError {
     Duplicate,
     NotFound,

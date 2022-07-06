@@ -40,6 +40,12 @@ pub struct DbEquation {
     pub creator_id: String,
 }
 
+#[derive(Serialize, Deserialize)]
+pub struct EquationIdAndTitle {
+    pub id: String,
+    pub title: String,
+}
+
 pub struct InsertableDbEquation {
     pub title: String,
     pub content: String,

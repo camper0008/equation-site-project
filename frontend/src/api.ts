@@ -1,10 +1,10 @@
 export const apiUrl = (): string => {
     if (window.location.hostname === "localhost") {
-        return "http://localhost:8080/"
+        return "http://localhost:8080";
     } else {
-        return "/api"
+        return "/api";
     }
-}
+};
 
 type body = BodyInit | null | undefined;
 
