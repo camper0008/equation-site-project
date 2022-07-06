@@ -5,7 +5,7 @@ import { Logo } from "./Logo";
 import { StateManager } from "../StateManager";
 
 const autoCompleteValues = (): string[] => {
-    return ["Edge", "Firefox", "Chrome", "Opera", "Safari"];
+    return [];
 };
 
 const AutoCompleteList = () => {
