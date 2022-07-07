@@ -81,10 +81,7 @@ impl MongoDb {
         create_unique_text_title_index(&client, &db_name).await;
         create_unique_username_index(&client, &db_name).await;
 
-        Self {
-            client: client,
-            db_name: db_name,
-        }
+        Self { client, db_name }
     }
 
     pub async fn add_user(&mut self, insertable_user: InsertableDbUser) -> Result<(), DbError> {
@@ -199,10 +196,9 @@ impl MongoDb {
         };
 
         let duplicate_title_option = duplicate_title_result?;
-        if duplicate_title_option.is_some() {
-            if duplicate_title_option.unwrap().id != post_id {
-                return Err(DbError::Duplicate);
-            };
+
+        if duplicate_title_option.is_some() && duplicate_title_option.unwrap().id != post_id {
+            return Err(DbError::Duplicate);
         };
 
         let existing_post_result = match collection

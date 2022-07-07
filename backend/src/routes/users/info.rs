@@ -54,6 +54,6 @@ pub async fn info(db: web::Data<Mutex<Db>>, req: HttpRequest) -> impl Responder 
         .json(InfoResponse {
             ok: true,
             msg: "success".to_string(),
-            user: user,
+            user,
         })
 }

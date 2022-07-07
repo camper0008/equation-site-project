@@ -31,11 +31,11 @@ pub async fn one(db: web::Data<Mutex<Db>>, post_id: web::Path<String>) -> impl R
 
     let found_equation = found_equation_option.unwrap();
     let equation = Equation {
-        id: found_equation.id.clone(),
-        title: found_equation.title.clone(),
-        content: found_equation.content.clone(),
-        date_created: found_equation.date_created.clone(),
-        creator_id: found_equation.creator_id.clone(),
+        id: found_equation.id,
+        title: found_equation.title,
+        content: found_equation.content,
+        date_created: found_equation.date_created,
+        creator_id: found_equation.creator_id,
     };
 
     HttpResponse::Ok()
@@ -43,6 +43,6 @@ pub async fn one(db: web::Data<Mutex<Db>>, post_id: web::Path<String>) -> impl R
         .json(OneResponse {
             ok: true,
             msg: "success".to_string(),
-            equation: equation,
+            equation,
         })
 }

@@ -1,7 +1,6 @@
 use crate::database::mongo_db::MongoDb;
 use actix_cors::Cors;
 use actix_web::{web::Data, App, HttpServer};
-use dotenv;
 use std::{env, sync::Mutex};
 
 mod database;

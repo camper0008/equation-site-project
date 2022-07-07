@@ -74,19 +74,13 @@ pub fn gen_8_char_random_valid_string() -> Result<String, GenRandomError> {
 pub fn internal_server_error_response(msg: String) -> HttpResponse {
     HttpResponse::InternalServerError()
         .insert_header(ContentType::json())
-        .json(GenericResponse {
-            ok: false,
-            msg: msg,
-        })
+        .json(GenericResponse { ok: false, msg })
 }
 
 pub fn bad_request_response(msg: String) -> HttpResponse {
     HttpResponse::BadRequest()
         .insert_header(ContentType::json())
-        .json(GenericResponse {
-            ok: false,
-            msg: msg,
-        })
+        .json(GenericResponse { ok: false, msg })
 }
 
 pub enum CookieHeaderError {
