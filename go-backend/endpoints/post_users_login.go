@@ -43,6 +43,7 @@ func (shared *SharedContext) PostUsersLoginEndpoint(c *gin.Context) {
 	session := models.Session(token)
 	shared.Database.BindSessionToUser(session, dbUser)
 
+	c.SetSameSite(http.SameSiteLaxMode)
 	c.SetCookie("SESSION_TOKEN", string(session), 0, "/", utils.Domain(), false, true)
 
 	c.JSON(http.StatusOK, gin.H{"ok": true, "msg": "success"})

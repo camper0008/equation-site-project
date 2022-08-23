@@ -6,24 +6,28 @@
 
 - [x] POST `/users/logout`
 
-- [ ] POST `/users/create`
+- [x] POST `/users/create`
 
-- [ ] GET `/users/info`
+- [x] GET `/users/info`
 
-- [ ] POST `/equations/create`
+- [x] POST `/equations/create`
 
-- [ ] POST `/equations/remove/{post_id}`
+- [x] POST `/equations/remove/{post_id}`
 
-- [ ] POST `/equations/edit/{post_id}`
+- [x] POST `/equations/edit/{post_id}`
 
-- [ ] GET `/equations/one/{post_id}`
+- [x] GET `/equations/one/{post_id}`
 
-- [ ] GET `/equations/search/{title}`
+- [x] GET `/equations/search/{title}`
 
 ## functionality
 
-- [ ] good search
+- [x] good search
 
 - [ ] proper database implementation rather than memory
 
 - [ ] benchmarking
+
+## refactoring
+
+- [ ] every "step" (i.e. if-block required) should be it's own function

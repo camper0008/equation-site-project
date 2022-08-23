@@ -8,8 +8,9 @@ import (
 )
 
 type MemoryDb struct {
-	users    []models.User
-	sessions map[models.Session]models.User
+	users     []models.User
+	equations []models.Equation
+	sessions  map[models.Session]models.User
 }
 
 func (db *MemoryDb) Init() {
@@ -57,4 +58,59 @@ func (db *MemoryDb) UnbindSession(session models.Session) error {
 	}
 	delete(db.sessions, session)
 	return nil
+}
+
+func (db *MemoryDb) InsertUser(user models.User) error {
+	if _, err := db.UserFromUsername(user.Username); err == nil {
+		return fmt.Errorf("username taken")
+	}
+	db.users = append(db.users, user)
+	return nil
+}
+
+func (db *MemoryDb) InsertEquation(eq models.Equation) error {
+	db.equations = append(db.equations, eq)
+	return nil
+}
+
+func (db *MemoryDb) EquationFromId(id models.Id) (models.Equation, error) {
+	for _, eq := range db.equations {
+		if eq.Id == id {
+			return eq, nil
+		}
+	}
+	return models.Equation{}, fmt.Errorf("equation does not exist")
+}
+
+func (db *MemoryDb) UpdateEquation(newEq models.Equation) error {
+	for idx, eq := range db.equations {
+		if eq.Id == newEq.Id {
+			db.equations[idx] = newEq
+			return nil
+		}
+	}
+	return fmt.Errorf("equation does not exist")
+}
+
+func (db *MemoryDb) AllEquations() ([]models.PreviewableEquation, error) {
+	res := make([]models.PreviewableEquation, len(db.equations))
+	for idx, eq := range db.equations {
+		res[idx] = models.PreviewableEquation{
+			Id:          eq.Id,
+			Title:       eq.Title,
+			DateCreated: eq.DateCreated,
+		}
+	}
+	return res, nil
+}
+
+func (db *MemoryDb) RemoveEquation(givenEq models.Equation) error {
+	for idx, eq := range db.equations {
+		if eq.Id == givenEq.Id {
+			db.equations[idx], db.equations[len(db.equations)-1] = db.equations[len(db.equations)-1], db.equations[idx]
+			db.equations = db.equations[:len(db.equations)-2]
+			return nil
+		}
+	}
+	return fmt.Errorf("equation does not exist")
 }
