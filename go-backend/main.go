@@ -3,11 +3,21 @@ package main
 import (
 	"equation-site-backend/db_impl"
 	"equation-site-backend/endpoints"
+	"os"
 
 	"github.com/gin-gonic/gin"
+
+	_ "github.com/joho/godotenv/autoload"
 )
 
+func environmentVariablesSpecified() {
+	if os.Getenv("DOMAIN") == "" {
+		panic("domain environment variable not set")
+	}
+}
+
 func main() {
+	environmentVariablesSpecified()
 	router := gin.Default()
 
 	db := &db_impl.MemoryDb{}
@@ -24,7 +34,7 @@ func main() {
 	}
 	equations := api.Group("/equations")
 	{
-		equations.GET("/", func(c *gin.Context) {
+		equations.GET("/ping", func(c *gin.Context) {
 			panic("not implemented")
 		})
 	}
@@ -32,7 +42,7 @@ func main() {
 	contributorOnlyEquations := api.Group("/equations")
 	contributorOnlyEquations.Use(sharedContext.ContributorRequired)
 	{
-		contributorOnlyEquations.GET("/", func(c *gin.Context) {
+		contributorOnlyEquations.GET("/test", func(c *gin.Context) {
 			panic("not implemented")
 		})
 	}

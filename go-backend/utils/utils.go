@@ -3,6 +3,7 @@ package utils
 import (
 	"crypto/rand"
 	"encoding/hex"
+	"os"
 )
 
 func GenerateSecureToken(length int) (string, error) {
@@ -11,4 +12,8 @@ func GenerateSecureToken(length int) (string, error) {
 		return "", err
 	}
 	return hex.EncodeToString(b), nil
+}
+
+func Domain() string {
+	return os.Getenv("DOMAIN")
 }

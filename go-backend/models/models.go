@@ -10,6 +10,7 @@ type DB interface {
 	UserFromUsername(Username) (User, error)
 	UserFromSession(Session) (User, error)
 	BindSessionToUser(Session, User) error
+	UnbindSession(Session) error
 }
 
 type User struct {
