@@ -43,7 +43,7 @@ pub async fn create(db: web::Data<Mutex<Db>>, req: web::Json<CreateRequest>) -> 
     };
 
     match (**db).lock().unwrap().add_user(user).await {
-        Ok(_) => HttpResponse::Ok()
+        Ok(_) => HttpResponse::Created()
             .insert_header(ContentType::json())
             .json(GenericResponse {
                 ok: true,
