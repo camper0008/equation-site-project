@@ -82,7 +82,7 @@ const Register: Component<Props> = ({ state }) => {
 
         setFetching(false);
 
-        if (!res.ok) {
+        if (!res.Created) {
             if (res.msg === "invalid username") {
                 setFieldIssues({
                     username: capitalizeFirstLetter(
