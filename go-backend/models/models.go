@@ -8,6 +8,7 @@ type Password string
 type DateCreated string
 
 type DB interface {
+	Init()
 	InsertUser(User) error
 	UserFromUsername(Username) (User, error)
 	UserFromSession(Session) (User, error)
@@ -25,7 +26,7 @@ type User struct {
 	Username    Username
 	Password    Password
 	Permission  Permission
-	DateCreated DateCreated
+	DateCreated DateCreated `bson:"date_created"`
 }
 
 type Equation struct {
@@ -33,13 +34,13 @@ type Equation struct {
 	Title       string
 	Content     string
 	Creator     User
-	DateCreated DateCreated
+	DateCreated DateCreated `bson:"date_created"`
 }
 
 type PreviewableEquation struct {
 	Id          Id
 	Title       string
-	DateCreated DateCreated
+	DateCreated DateCreated `bson:"date_created"`
 }
 
 type Permission int
