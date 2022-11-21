@@ -1,5 +1,7 @@
 package db_impl
 
+/*
+
 import (
 	"context"
 	"equation-site-backend/models"
@@ -130,3 +132,4 @@ func (db *MongoDb) AllEquations() ([]models.PreviewableEquation, error) {
 
 	return res, nil
 }
+*/
