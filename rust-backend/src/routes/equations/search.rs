@@ -16,12 +16,8 @@ struct SearchResponse {
 pub async fn search(db: web::Data<Mutex<Db>>, title: web::Path<String>) -> impl Responder {
     let mut db = (**db).lock().await;
 
-    let equations_result = equations(&mut db, title.to_string()).await;
-    let equations = match equations_result {
-        Ok(equations) => equations,
-        Err(_) => {
-            return internal_server_error_response("db error".to_string());
-        }
+    let Ok(equations) = equations(&mut db, title.to_string()).await else {
+        return internal_server_error_response("db error".to_string());
     };
 
     HttpResponse::Ok()

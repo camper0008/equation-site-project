@@ -1,8 +1,8 @@
-use crate::cookie::CookieHeaderError;
-use crate::database::db::Error;
+use crate::cookie;
+use crate::database::db;
+use crate::database::db::Db;
 use crate::models::GenericResponse;
 use crate::response_helper::{bad_request_response, internal_server_error_response};
-use crate::{cookie::cookie_from_header, database::db::Db};
 use actix_web::{
     cookie::{time::Duration, Cookie},
     http::header::ContentType,
@@ -12,12 +12,12 @@ use futures::lock::Mutex;
 
 #[post("/users/logout")]
 pub async fn logout(db: web::Data<Mutex<Db>>, req: HttpRequest) -> impl Responder {
-    let cookie = match cookie_from_header(req.headers()) {
+    let cookie = match cookie::from_header(req.headers()) {
         Ok(cookie) => cookie.value().to_string(),
         Err(err) => {
             return bad_request_response(match err {
-                CookieHeaderError::Malformed => "malformed cookie header".to_string(),
-                CookieHeaderError::NotIncluded => "cookie header not included".to_string(),
+                cookie::Error::Malformed => "malformed cookie header".to_string(),
+                cookie::Error::NotIncluded => "cookie header not included".to_string(),
             })
         }
     };
@@ -25,11 +25,11 @@ pub async fn logout(db: web::Data<Mutex<Db>>, req: HttpRequest) -> impl Responde
     let mut db = (**db).lock().await;
     match db.session_user_from_token(cookie.clone()).await {
         Ok(_) => {}
-        Err(Error::NotFound) => return bad_request_response("invalid cookie".to_string()),
+        Err(db::Error::NotFound) => return bad_request_response("invalid cookie".to_string()),
         Err(_) => return internal_server_error_response("db error".to_string()),
     };
 
-    if let Err(_) = db.delete_user_session(cookie).await {
+    if db.delete_user_session(cookie).await.is_err() {
         return internal_server_error_response("db error".to_string());
     };
 

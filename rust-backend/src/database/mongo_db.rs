@@ -1,6 +1,6 @@
 use crate::char_generation::gen_8_char_random_valid_string;
 use crate::database::db::Error;
-use crate::iso_string::utc_date_iso_string;
+use crate::date_helper::utc_date_iso_string;
 use crate::models::{
     DbEquation, DbSession, DbUser, InsertableDbEquation, InsertableDbSession, InsertableDbUser,
     PreviewableEquation, SessionToken,
@@ -171,10 +171,10 @@ impl MongoDb {
             .await
         {
             Ok(Some(maybe_duplicate)) => {
-                if maybe_duplicate.id != post_id {
-                    Err(Error::Duplicate)
-                } else {
+                if maybe_duplicate.id == post_id {
                     Ok(())
+                } else {
+                    Err(Error::Duplicate)
                 }
             }
             Ok(None) => Ok(()),

@@ -1,8 +1,8 @@
-use crate::cookie::CookieHeaderError;
-use crate::database::db::Error;
+use crate::cookie;
+use crate::database::db;
+use crate::database::db::Db;
 use crate::models::User;
 use crate::response_helper::{bad_request_response, internal_server_error_response};
-use crate::{cookie::cookie_from_header, database::db::Db};
 use actix_web::{get, http::header::ContentType, web, HttpRequest, HttpResponse, Responder};
 use futures::lock::Mutex;
 use serde::Serialize;
@@ -16,12 +16,12 @@ struct InfoResponse {
 
 #[get("/users/info")]
 pub async fn info(db: web::Data<Mutex<Db>>, req: HttpRequest) -> impl Responder {
-    let cookie = match cookie_from_header(req.headers()) {
+    let cookie = match cookie::from_header(req.headers()) {
         Ok(cookie) => cookie.value().to_string(),
         Err(err) => {
             return bad_request_response(match err {
-                CookieHeaderError::Malformed => "malformed cookie header".to_string(),
-                CookieHeaderError::NotIncluded => "cookie header not included".to_string(),
+                cookie::Error::Malformed => "malformed cookie header".to_string(),
+                cookie::Error::NotIncluded => "cookie header not included".to_string(),
             });
         }
     };
@@ -30,7 +30,7 @@ pub async fn info(db: web::Data<Mutex<Db>>, req: HttpRequest) -> impl Responder 
 
     let user = match db.session_user_from_token(cookie).await {
         Ok(user) => user,
-        Err(Error::NotFound) => {
+        Err(db::Error::NotFound) => {
             return bad_request_response("invalid cookie".to_string());
         }
         Err(_) => {

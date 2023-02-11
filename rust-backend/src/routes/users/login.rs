@@ -49,7 +49,7 @@ pub async fn login(db: web::Data<Mutex<Db>>, req: web::Json<Request>) -> impl Re
         token: random_token_string.clone(),
     };
 
-    if let Err(_) = db.add_session(session).await {
+    if db.add_session(session).await.is_err() {
         return internal_server_error_response("db error".to_string());
     };
 

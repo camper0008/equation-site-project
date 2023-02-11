@@ -1,21 +1,21 @@
 use actix_web::{cookie::Cookie, http::header::HeaderMap};
 
-pub enum CookieHeaderError {
+pub enum Error {
     Malformed,
     NotIncluded,
 }
 
-pub fn cookie_from_header(headers: &HeaderMap) -> Result<Cookie, CookieHeaderError> {
+pub fn from_header(headers: &HeaderMap) -> Result<Cookie, Error> {
     let Some(cookie_header_option) = headers.get("Cookie") else {
-        return Err(CookieHeaderError::NotIncluded);
+        return Err(Error::NotIncluded);
     };
 
     let Ok(cookie_header_stringify_result) = cookie_header_option.to_str() else {
-        return Err(CookieHeaderError::Malformed);
+        return Err(Error::Malformed);
     };
 
     let Ok(parsed_cookie) = Cookie::parse(cookie_header_stringify_result) else {
-        return Err(CookieHeaderError::Malformed);
+        return Err(Error::Malformed);
     };
 
     Ok(parsed_cookie)

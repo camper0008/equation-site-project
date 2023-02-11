@@ -26,11 +26,8 @@ pub async fn create(db: web::Data<Mutex<Db>>, req: web::Json<Request>) -> impl R
         }
     }
 
-    let hashed_password = match hash(req.password.clone(), DEFAULT_COST) {
-        Ok(hashed) => hashed,
-        Err(_) => {
-            return internal_server_error_response("bcrypt error".to_string());
-        }
+    let Ok(hashed_password) = hash(req.password.clone(), DEFAULT_COST) else {
+        return internal_server_error_response("bcrypt error".to_string());
     };
 
     let user = InsertableDbUser {
