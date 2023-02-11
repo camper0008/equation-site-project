@@ -1,7 +1,6 @@
-use crate::database::db::Db;
 use crate::models::PreviewableEquation;
 use crate::search::equations;
-use crate::utils::internal_server_error_response;
+use crate::{database::db::Db, response_helper::internal_server_error_response};
 use actix_web::{get, http::header::ContentType, web, HttpResponse, Responder};
 use futures::lock::Mutex;
 use serde::Serialize;

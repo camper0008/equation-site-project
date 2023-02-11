@@ -1,9 +1,10 @@
-use crate::database::db::DbError;
+use crate::char_generation::gen_8_char_random_valid_string;
+use crate::database::db::Error;
+use crate::iso_string::utc_date_iso_string;
 use crate::models::{
     DbEquation, DbSession, DbUser, InsertableDbEquation, InsertableDbSession, InsertableDbUser,
     PreviewableEquation, SessionToken,
 };
-use crate::utils::{gen_8_char_random_valid_string, utc_date_iso_string};
 use futures::TryStreamExt;
 use mongodb::{
     bson::doc, options::FindOptions, options::IndexOptions, Client, Collection, IndexModel,
@@ -84,7 +85,7 @@ impl MongoDb {
         Self { client, db_name }
     }
 
-    pub async fn add_user(&mut self, insertable_user: InsertableDbUser) -> Result<(), DbError> {
+    pub async fn add_user(&mut self, insertable_user: InsertableDbUser) -> Result<(), Error> {
         let collection: Collection<DbUser> =
             self.client.database(&self.db_name).collection("users");
         let duplicate_user_result = match collection
@@ -93,17 +94,17 @@ impl MongoDb {
         {
             Ok(Some(user)) => Ok(Some(user)),
             Ok(None) => Ok(None),
-            Err(err) => Err(DbError::Custom(err.to_string())),
+            Err(err) => Err(Error::Custom(err.to_string())),
         };
 
         let duplicate_user = duplicate_user_result?;
         if duplicate_user.is_some() {
-            return Err(DbError::Duplicate);
+            return Err(Error::Duplicate);
         };
 
         let random_id_result = match gen_8_char_random_valid_string() {
             Ok(random_id) => Ok(random_id),
-            Err(_) => Err(DbError::Custom("openssl error".to_string())),
+            Err(_) => Err(Error::Custom("openssl error".to_string())),
         };
         let random_id = random_id_result?;
 
@@ -119,11 +120,11 @@ impl MongoDb {
 
         match result {
             Ok(_) => Ok(()),
-            Err(err) => Err(DbError::Custom(err.to_string())),
+            Err(err) => Err(Error::Custom(err.to_string())),
         }
     }
 
-    pub async fn user_from_name(&self, username: String) -> Result<Option<DbUser>, DbError> {
+    pub async fn user_from_name(&self, username: String) -> Result<Option<DbUser>, Error> {
         let collection: Collection<DbUser> =
             self.client.database(&self.db_name).collection("users");
         match collection
@@ -132,14 +133,14 @@ impl MongoDb {
         {
             Ok(Some(user)) => Ok(Some(user)),
             Ok(None) => Ok(None),
-            Err(err) => Err(DbError::Custom(err.to_string())),
+            Err(err) => Err(Error::Custom(err.to_string())),
         }
     }
 
     pub async fn add_equation(
         &mut self,
         insertable_equation: InsertableDbEquation,
-    ) -> Result<(), DbError> {
+    ) -> Result<(), Error> {
         let collection: Collection<DbEquation> =
             self.client.database(&self.db_name).collection("equations");
         let duplicate_equation_result = match collection
@@ -148,17 +149,17 @@ impl MongoDb {
         {
             Ok(Some(equation)) => Ok(Some(equation)),
             Ok(None) => Ok(None),
-            Err(err) => Err(DbError::Custom(err.to_string())),
+            Err(err) => Err(Error::Custom(err.to_string())),
         };
 
         let duplicate_equation = duplicate_equation_result?;
         if duplicate_equation.is_some() {
-            return Err(DbError::Duplicate);
+            return Err(Error::Duplicate);
         };
 
         let random_id_result = match gen_8_char_random_valid_string() {
             Ok(random_id) => Ok(random_id),
-            Err(_) => Err(DbError::Custom("openssl error".to_string())),
+            Err(_) => Err(Error::Custom("openssl error".to_string())),
         };
         let random_id = random_id_result?;
 
@@ -174,7 +175,7 @@ impl MongoDb {
 
         match result {
             Ok(_) => Ok(()),
-            Err(err) => Err(DbError::Custom(err.to_string())),
+            Err(err) => Err(Error::Custom(err.to_string())),
         }
     }
 
@@ -182,7 +183,7 @@ impl MongoDb {
         &mut self,
         insertable_equation: InsertableDbEquation,
         post_id: String,
-    ) -> Result<(), DbError> {
+    ) -> Result<(), Error> {
         let collection: Collection<DbEquation> =
             self.client.database(&self.db_name).collection("equations");
 
@@ -192,13 +193,13 @@ impl MongoDb {
         {
             Ok(Some(equation)) => Ok(Some(equation)),
             Ok(None) => Ok(None),
-            Err(err) => Err(DbError::Custom(err.to_string())),
+            Err(err) => Err(Error::Custom(err.to_string())),
         };
 
         let duplicate_title_option = duplicate_title_result?;
 
         if duplicate_title_option.is_some() && duplicate_title_option.unwrap().id != post_id {
-            return Err(DbError::Duplicate);
+            return Err(Error::Duplicate);
         };
 
         let existing_post_result = match collection
@@ -207,12 +208,12 @@ impl MongoDb {
         {
             Ok(Some(equation)) => Ok(Some(equation)),
             Ok(None) => Ok(None),
-            Err(err) => Err(DbError::Custom(err.to_string())),
+            Err(err) => Err(Error::Custom(err.to_string())),
         };
 
         let existing_id_option = existing_post_result?;
         if existing_id_option.is_none() {
-            return Err(DbError::NotFound);
+            return Err(Error::NotFound);
         };
 
         let result = collection
@@ -232,31 +233,31 @@ impl MongoDb {
 
         match result {
             Ok(_) => Ok(()),
-            Err(err) => Err(DbError::Custom(err.to_string())),
+            Err(err) => Err(Error::Custom(err.to_string())),
         }
     }
 
-    pub async fn equation_from_id(&self, id: String) -> Result<Option<DbEquation>, DbError> {
+    pub async fn equation_from_id(&self, id: String) -> Result<Option<DbEquation>, Error> {
         let collection: Collection<DbEquation> =
             self.client.database(&self.db_name).collection("equations");
         match collection.find_one(doc! { "id": id }, None).await {
             Ok(Some(equation)) => Ok(Some(equation)),
             Ok(None) => Ok(None),
-            Err(err) => Err(DbError::Custom(err.to_string())),
+            Err(err) => Err(Error::Custom(err.to_string())),
         }
     }
 
-    pub async fn equation_from_title(&self, title: String) -> Result<Option<DbEquation>, DbError> {
+    pub async fn equation_from_title(&self, title: String) -> Result<Option<DbEquation>, Error> {
         let collection: Collection<DbEquation> =
             self.client.database(&self.db_name).collection("equations");
         match collection.find_one(doc! { "title": title }, None).await {
             Ok(Some(equation)) => Ok(Some(equation)),
             Ok(None) => Ok(None),
-            Err(err) => Err(DbError::Custom(err.to_string())),
+            Err(err) => Err(Error::Custom(err.to_string())),
         }
     }
 
-    pub async fn all_titles(&self) -> Result<Vec<PreviewableEquation>, DbError> {
+    pub async fn all_titles(&self) -> Result<Vec<PreviewableEquation>, Error> {
         self.client
             .database(&self.db_name)
             .collection("equations")
@@ -267,16 +268,16 @@ impl MongoDb {
                     .build(),
             )
             .await
-            .map_err(|e| DbError::Custom(format!("title recieving error, {e}")))?
+            .map_err(|e| Error::Custom(format!("title recieving error, {e}")))?
             .try_collect()
             .await
-            .map_err(|_| DbError::Custom("title collection error".to_string()))
+            .map_err(|_| Error::Custom("title collection error".to_string()))
     }
 
     pub async fn add_session(
         &mut self,
         insertable_session: InsertableDbSession,
-    ) -> Result<(), DbError> {
+    ) -> Result<(), Error> {
         let collection: Collection<DbSession> =
             self.client.database(&self.db_name).collection("sessions");
 
@@ -289,14 +290,14 @@ impl MongoDb {
         let result = collection.insert_one(session, None).await;
         match result {
             Ok(_) => Ok(()),
-            Err(err) => Err(DbError::Custom(err.to_string())),
+            Err(err) => Err(Error::Custom(err.to_string())),
         }
     }
 
     pub async fn session_user_from_token(
         &mut self,
         token: SessionToken,
-    ) -> Result<Option<DbUser>, DbError> {
+    ) -> Result<Option<DbUser>, Error> {
         let session_collection: Collection<DbSession> =
             self.client.database(&self.db_name).collection("sessions");
         let session_result = match session_collection
@@ -305,7 +306,7 @@ impl MongoDb {
         {
             Ok(Some(session)) => Ok(Some(session)),
             Ok(None) => Ok(None),
-            Err(err) => Err(DbError::Custom(err.to_string())),
+            Err(err) => Err(Error::Custom(err.to_string())),
         };
 
         if session_result.is_err() {
@@ -326,7 +327,7 @@ impl MongoDb {
         {
             Ok(Some(user)) => Ok(Some(user)),
             Ok(None) => Ok(None),
-            Err(err) => Err(DbError::Custom(err.to_string())),
+            Err(err) => Err(Error::Custom(err.to_string())),
         };
 
         user_result
@@ -335,7 +336,7 @@ impl MongoDb {
     pub async fn delete_user_session(
         &mut self,
         token: SessionToken,
-    ) -> Result<Option<DbSession>, DbError> {
+    ) -> Result<Option<DbSession>, Error> {
         let collection: Collection<DbSession> =
             self.client.database(&self.db_name).collection("sessions");
         match collection
@@ -344,7 +345,7 @@ impl MongoDb {
         {
             Ok(Some(session)) => Ok(Some(session)),
             Ok(None) => Ok(None),
-            Err(err) => Err(DbError::Custom(err.to_string())),
+            Err(err) => Err(Error::Custom(err.to_string())),
         }
     }
 }

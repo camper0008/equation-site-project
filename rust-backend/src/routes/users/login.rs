@@ -1,8 +1,7 @@
+use crate::char_generation::gen_64_char_random_valid_string;
 use crate::database::db::Db;
 use crate::models::{GenericResponse, InsertableDbSession};
-use crate::utils::{
-    bad_request_response, gen_64_char_random_valid_string, internal_server_error_response,
-};
+use crate::response_helper::{bad_request_response, internal_server_error_response};
 use actix_web::{
     cookie::{time::Duration, Cookie, SameSite},
     http::header::ContentType,

@@ -1,6 +1,6 @@
-use crate::database::db::Db;
 use crate::models::Equation;
-use crate::utils::{bad_request_response, internal_server_error_response};
+use crate::response_helper::bad_request_response;
+use crate::{database::db::Db, response_helper::internal_server_error_response};
 use actix_web::{get, http::header::ContentType, web, HttpResponse, Responder};
 use futures::lock::Mutex;
 use serde::Serialize;

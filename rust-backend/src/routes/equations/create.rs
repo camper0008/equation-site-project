@@ -1,8 +1,7 @@
-use crate::database::db::{Db, DbError};
+use crate::cookie::{cookie_from_header, CookieHeaderError};
+use crate::database::db::{Db, Error};
 use crate::models::{GenericResponse, InsertableDbEquation, Permission};
-use crate::utils::{
-    bad_request_response, cookie_from_header, internal_server_error_response, CookieHeaderError,
-};
+use crate::response_helper::{bad_request_response, internal_server_error_response};
 use actix_web::{http::header::ContentType, post, web, HttpRequest, HttpResponse, Responder};
 use futures::lock::Mutex;
 use serde::Deserialize;
@@ -72,7 +71,7 @@ pub async fn create(
                 msg: "success".to_string(),
             }),
         Err(err) => match err {
-            DbError::Duplicate => bad_request_response("invalid title".to_string()),
+            Error::Duplicate => bad_request_response("invalid title".to_string()),
             _ => internal_server_error_response("db error".to_string()),
         },
     }

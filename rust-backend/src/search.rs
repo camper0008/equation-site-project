@@ -1,4 +1,4 @@
-use crate::database::db::{Db, DbError};
+use crate::database::db::{Db, Error};
 use crate::models::PreviewableEquation;
 use std::cmp::Ordering;
 
@@ -96,8 +96,8 @@ fn levenshtein(a: &str, b: &str) -> usize {
     result
 }
 
-pub async fn equations(db: &mut Db, query: String) -> Result<Vec<PreviewableEquation>, DbError> {
-    let mut levenshteined = db
+pub async fn equations(db: &mut Db, query: String) -> Result<Vec<PreviewableEquation>, Error> {
+    let mut levenshteined: Vec<PrevEqWithLevDist> = db
         .all_titles()
         .await?
         .into_iter()
@@ -107,7 +107,7 @@ pub async fn equations(db: &mut Db, query: String) -> Result<Vec<PreviewableEqua
             date_created: eq.date_created,
             lev_dist: levenshtein(&eq.title, &query),
         })
-        .collect::<Vec<PrevEqWithLevDist>>();
+        .collect();
     levenshteined.sort_unstable();
     Ok(levenshteined
         .into_iter()

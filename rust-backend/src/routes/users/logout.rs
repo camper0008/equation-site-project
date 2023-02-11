@@ -1,8 +1,7 @@
-use crate::database::db::Db;
+use crate::cookie::CookieHeaderError;
 use crate::models::GenericResponse;
-use crate::utils::{
-    bad_request_response, cookie_from_header, internal_server_error_response, CookieHeaderError,
-};
+use crate::response_helper::{bad_request_response, internal_server_error_response};
+use crate::{cookie::cookie_from_header, database::db::Db};
 use actix_web::{
     cookie::Cookie, http::header::ContentType, post, web, HttpRequest, HttpResponse, Responder,
 };

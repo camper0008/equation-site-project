@@ -3,11 +3,14 @@ use actix_cors::Cors;
 use actix_web::{web::Data, App, HttpServer};
 use std::{env, sync::Mutex};
 
+mod char_generation;
+mod cookie;
 mod database;
+mod iso_string;
 mod models;
+mod response_helper;
 mod routes;
 mod search;
-mod utils;
 
 use crate::routes::equations;
 use crate::routes::users;
