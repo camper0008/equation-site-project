@@ -88,25 +88,17 @@ impl MongoDb {
     pub async fn add_user(&mut self, insertable_user: InsertableDbUser) -> Result<(), Error> {
         let collection: Collection<DbUser> =
             self.client.database(&self.db_name).collection("users");
-        let duplicate_user_result = match collection
+
+        match collection
             .find_one(doc! { "username": &insertable_user.username.clone() }, None)
             .await
         {
-            Ok(Some(user)) => Ok(Some(user)),
-            Ok(None) => Ok(None),
+            Ok(None) => Ok(()),
+            Ok(Some(_)) => Err(Error::Duplicate),
             Err(err) => Err(Error::Custom(err.to_string())),
-        };
+        }?;
 
-        let duplicate_user = duplicate_user_result?;
-        if duplicate_user.is_some() {
-            return Err(Error::Duplicate);
-        };
-
-        let random_id_result = match gen_8_char_random_valid_string() {
-            Ok(random_id) => Ok(random_id),
-            Err(_) => Err(Error::Custom("openssl error".to_string())),
-        };
-        let random_id = random_id_result?;
+        let random_id = gen_8_char_random_valid_string()?;
 
         let user = DbUser {
             id: random_id,
@@ -116,17 +108,15 @@ impl MongoDb {
             date_created: utc_date_iso_string(),
         };
 
-        let result = collection.insert_one(user, None).await;
+        collection.insert_one(user, None).await?;
 
-        match result {
-            Ok(_) => Ok(()),
-            Err(err) => Err(Error::Custom(err.to_string())),
-        }
+        Ok(())
     }
 
     pub async fn user_from_name(&self, username: String) -> Result<Option<DbUser>, Error> {
         let collection: Collection<DbUser> =
             self.client.database(&self.db_name).collection("users");
+
         match collection
             .find_one(doc! { "username": username }, None)
             .await
@@ -143,25 +133,17 @@ impl MongoDb {
     ) -> Result<(), Error> {
         let collection: Collection<DbEquation> =
             self.client.database(&self.db_name).collection("equations");
-        let duplicate_equation_result = match collection
+
+        match collection
             .find_one(doc! { "title": &insertable_equation.title.clone() }, None)
             .await
         {
-            Ok(Some(equation)) => Ok(Some(equation)),
-            Ok(None) => Ok(None),
+            Ok(None) => Ok(()),
+            Ok(Some(_)) => Err(Error::Duplicate),
             Err(err) => Err(Error::Custom(err.to_string())),
-        };
+        }?;
 
-        let duplicate_equation = duplicate_equation_result?;
-        if duplicate_equation.is_some() {
-            return Err(Error::Duplicate);
-        };
-
-        let random_id_result = match gen_8_char_random_valid_string() {
-            Ok(random_id) => Ok(random_id),
-            Err(_) => Err(Error::Custom("openssl error".to_string())),
-        };
-        let random_id = random_id_result?;
+        let random_id = gen_8_char_random_valid_string()?;
 
         let equation = DbEquation {
             id: random_id,
@@ -171,12 +153,9 @@ impl MongoDb {
             date_created: utc_date_iso_string(),
         };
 
-        let result = collection.insert_one(equation, None).await;
+        collection.insert_one(equation, None).await?;
 
-        match result {
-            Ok(_) => Ok(()),
-            Err(err) => Err(Error::Custom(err.to_string())),
-        }
+        Ok(())
     }
 
     pub async fn update_equation_from_id(
@@ -187,36 +166,31 @@ impl MongoDb {
         let collection: Collection<DbEquation> =
             self.client.database(&self.db_name).collection("equations");
 
-        let duplicate_title_result = match collection
+        match collection
             .find_one(doc! { "title": &insertable_equation.title.clone() }, None)
             .await
         {
-            Ok(Some(equation)) => Ok(Some(equation)),
-            Ok(None) => Ok(None),
+            Ok(Some(maybe_duplicate)) => {
+                if maybe_duplicate.id != post_id {
+                    Err(Error::Duplicate)
+                } else {
+                    Ok(())
+                }
+            }
+            Ok(None) => Ok(()),
             Err(err) => Err(Error::Custom(err.to_string())),
-        };
+        }?;
 
-        let duplicate_title_option = duplicate_title_result?;
-
-        if duplicate_title_option.is_some() && duplicate_title_option.unwrap().id != post_id {
-            return Err(Error::Duplicate);
-        };
-
-        let existing_post_result = match collection
+        match collection
             .find_one(doc! { "id": &post_id.clone() }, None)
             .await
         {
-            Ok(Some(equation)) => Ok(Some(equation)),
-            Ok(None) => Ok(None),
+            Ok(Some(_)) => Ok(()),
+            Ok(None) => Err(Error::NotFound),
             Err(err) => Err(Error::Custom(err.to_string())),
-        };
+        }?;
 
-        let existing_id_option = existing_post_result?;
-        if existing_id_option.is_none() {
-            return Err(Error::NotFound);
-        };
-
-        let result = collection
+        collection
             .update_one(
                 doc! {
                     "id": post_id
@@ -229,12 +203,9 @@ impl MongoDb {
                 },
                 None,
             )
-            .await;
+            .await?;
 
-        match result {
-            Ok(_) => Ok(()),
-            Err(err) => Err(Error::Custom(err.to_string())),
-        }
+        Ok(())
     }
 
     pub async fn equation_from_id(&self, id: String) -> Result<Option<DbEquation>, Error> {
@@ -294,58 +265,41 @@ impl MongoDb {
         }
     }
 
-    pub async fn session_user_from_token(
-        &mut self,
-        token: SessionToken,
-    ) -> Result<Option<DbUser>, Error> {
+    pub async fn session_user_from_token(&mut self, token: SessionToken) -> Result<DbUser, Error> {
         let session_collection: Collection<DbSession> =
             self.client.database(&self.db_name).collection("sessions");
-        let session_result = match session_collection
+        let session = match session_collection
             .find_one(doc! { "token": token }, None)
             .await
         {
-            Ok(Some(session)) => Ok(Some(session)),
-            Ok(None) => Ok(None),
+            Ok(Some(session)) => Ok(session),
+            Ok(None) => Err(Error::NotFound),
             Err(err) => Err(Error::Custom(err.to_string())),
-        };
+        }?;
 
-        if session_result.is_err() {
-            return Err(session_result.err().unwrap());
-        };
-
-        let session_or_none = session_result.ok().unwrap();
-        if session_or_none.is_none() {
-            return Ok(None);
-        };
-
-        let session = session_or_none.unwrap();
         let user_collection: Collection<DbUser> =
             self.client.database(&self.db_name).collection("users");
-        let user_result = match user_collection
+
+        match user_collection
             .find_one(doc! { "id": session.user_id }, None)
             .await
         {
-            Ok(Some(user)) => Ok(Some(user)),
-            Ok(None) => Ok(None),
-            Err(err) => Err(Error::Custom(err.to_string())),
-        };
-
-        user_result
+            Ok(Some(user)) => Ok(user),
+            Ok(None) => Err(Error::NotFound),
+            Err(err) => Err(Error::from(err)),
+        }
     }
 
-    pub async fn delete_user_session(
-        &mut self,
-        token: SessionToken,
-    ) -> Result<Option<DbSession>, Error> {
+    pub async fn delete_user_session(&mut self, token: SessionToken) -> Result<DbSession, Error> {
         let collection: Collection<DbSession> =
             self.client.database(&self.db_name).collection("sessions");
         match collection
             .find_one_and_delete(doc! { "token": token }, None)
             .await
         {
-            Ok(Some(session)) => Ok(Some(session)),
-            Ok(None) => Ok(None),
-            Err(err) => Err(Error::Custom(err.to_string())),
+            Ok(Some(session)) => Ok(session),
+            Ok(None) => Err(Error::NotFound),
+            Err(err) => Err(Error::from(err)),
         }
     }
 }
