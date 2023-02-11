@@ -89,13 +89,10 @@ impl MongoDb {
         let collection: Collection<DbUser> =
             self.client.database(&self.db_name).collection("users");
 
-        match collection
-            .find_one(doc! { "username": &insertable_user.username.clone() }, None)
-            .await
-        {
-            Ok(None) => Ok(()),
-            Ok(Some(_)) => Err(Error::Duplicate),
-            Err(err) => Err(Error::Custom(err.to_string())),
+        match self.user_from_name(insertable_user.username.clone()).await {
+            Err(Error::NotFound) => Ok(()),
+            Ok(_) => Err(Error::Duplicate),
+            err => err.map(|_| ()),
         }?;
 
         let random_id = gen_8_char_random_valid_string()?;
@@ -134,13 +131,13 @@ impl MongoDb {
         let collection: Collection<DbEquation> =
             self.client.database(&self.db_name).collection("equations");
 
-        match collection
-            .find_one(doc! { "title": &insertable_equation.title.clone() }, None)
+        match self
+            .equation_from_title(insertable_equation.title.clone())
             .await
         {
-            Ok(None) => Ok(()),
-            Ok(Some(_)) => Err(Error::Duplicate),
-            Err(err) => Err(Error::Custom(err.to_string())),
+            Err(Error::NotFound) => Ok(()),
+            Ok(_) => Err(Error::Duplicate),
+            err => err.map(|_| ()),
         }?;
 
         let random_id = gen_8_char_random_valid_string()?;
@@ -166,29 +163,16 @@ impl MongoDb {
         let collection: Collection<DbEquation> =
             self.client.database(&self.db_name).collection("equations");
 
-        match collection
-            .find_one(doc! { "title": &insertable_equation.title.clone() }, None)
+        match self
+            .equation_from_title(insertable_equation.title.clone())
             .await
         {
-            Ok(Some(maybe_duplicate)) => {
-                if maybe_duplicate.id == post_id {
-                    Ok(())
-                } else {
-                    Err(Error::Duplicate)
-                }
-            }
-            Ok(None) => Ok(()),
-            Err(err) => Err(Error::Custom(err.to_string())),
+            Ok(DbEquation { id, .. }) if id == post_id => Ok(()),
+            Ok(_) => Err(Error::Duplicate),
+            err => err.map(|_| ()),
         }?;
 
-        match collection
-            .find_one(doc! { "id": &post_id.clone() }, None)
-            .await
-        {
-            Ok(Some(_)) => Ok(()),
-            Ok(None) => Err(Error::NotFound),
-            Err(err) => Err(Error::Custom(err.to_string())),
-        }?;
+        self.equation_from_id(post_id.clone()).await?;
 
         collection
             .update_one(
@@ -215,7 +199,7 @@ impl MongoDb {
         match collection.find_one(doc! { "id": id }, None).await {
             Ok(Some(equation)) => Ok(equation),
             Ok(None) => Err(Error::NotFound),
-            Err(err) => Err(Error::Custom(err.to_string())),
+            Err(err) => Err(Error::from(err)),
         }
     }
 
@@ -225,7 +209,7 @@ impl MongoDb {
         match collection.find_one(doc! { "title": title }, None).await {
             Ok(Some(equation)) => Ok(equation),
             Ok(None) => Err(Error::NotFound),
-            Err(err) => Err(Error::Custom(err.to_string())),
+            Err(err) => Err(Error::from(err)),
         }
     }
 
@@ -262,7 +246,7 @@ impl MongoDb {
         let result = collection.insert_one(session, None).await;
         match result {
             Ok(_) => Ok(()),
-            Err(err) => Err(Error::Custom(err.to_string())),
+            Err(err) => Err(Error::from(err)),
         }
     }
 
