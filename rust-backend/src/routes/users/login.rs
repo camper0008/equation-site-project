@@ -20,11 +20,8 @@ pub struct LoginRequest {
 
 #[post("/users/login")]
 pub async fn login(db: web::Data<Mutex<Db>>, req: web::Json<LoginRequest>) -> impl Responder {
-    let result = (**db)
-        .lock()
-        .unwrap()
-        .user_from_name(req.username.clone())
-        .await;
+    let mut db = (**db).lock().unwrap();
+    let result = db.user_from_name(req.username.clone()).await;
 
     if result.is_err() {
         return internal_server_error_response("db error".to_string());
@@ -56,7 +53,7 @@ pub async fn login(db: web::Data<Mutex<Db>>, req: web::Json<LoginRequest>) -> im
         token: random_token_string.to_string(),
     };
 
-    let db_result = (**db).lock().unwrap().add_session(session).await;
+    let db_result = db.add_session(session).await;
     if db_result.is_err() {
         return internal_server_error_response("db error".to_string());
     };

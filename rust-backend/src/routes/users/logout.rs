@@ -19,11 +19,8 @@ pub async fn logout(db: web::Data<Mutex<Db>>, req: HttpRequest) -> impl Responde
     };
     let cookie = cookie_result.ok().unwrap();
 
-    let db_result = (**db)
-        .lock()
-        .unwrap()
-        .session_user_from_token(cookie.value().to_string())
-        .await;
+    let mut db = (**db).lock().unwrap();
+    let db_result = db.session_user_from_token(cookie.value().to_string()).await;
 
     if db_result.is_err() {
         return internal_server_error_response("db error".to_string());
@@ -34,11 +31,7 @@ pub async fn logout(db: web::Data<Mutex<Db>>, req: HttpRequest) -> impl Responde
         return bad_request_response("invalid cookie".to_string());
     }
 
-    let db_result = (**db)
-        .lock()
-        .unwrap()
-        .delete_user_session(cookie.value().to_string())
-        .await;
+    let db_result = db.delete_user_session(cookie.value().to_string()).await;
 
     if db_result.is_err() {
         return internal_server_error_response("db error".to_string());

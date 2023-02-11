@@ -14,11 +14,8 @@ pub struct CreateRequest {
 
 #[post("/users/create")]
 pub async fn create(db: web::Data<Mutex<Db>>, req: web::Json<CreateRequest>) -> impl Responder {
-    let user_get_result = (**db)
-        .lock()
-        .unwrap()
-        .user_from_name(req.username.clone())
-        .await;
+    let mut db = (**db).lock().unwrap();
+    let user_get_result = db.user_from_name(req.username.clone()).await;
 
     if user_get_result.is_err() {
         return internal_server_error_response("db error".to_string());
@@ -42,7 +39,7 @@ pub async fn create(db: web::Data<Mutex<Db>>, req: web::Json<CreateRequest>) -> 
         password: hashed,
     };
 
-    match (**db).lock().unwrap().add_user(user).await {
+    match db.add_user(user).await {
         Ok(_) => HttpResponse::Ok()
             .insert_header(ContentType::json())
             .json(GenericResponse {

@@ -25,12 +25,9 @@ pub async fn info(db: web::Data<Mutex<Db>>, req: HttpRequest) -> impl Responder 
     }
     let cookie = cookie_result.ok().unwrap();
 
-    let db_result = (**db)
-        .lock()
-        .unwrap()
-        .session_user_from_token(cookie.value().to_string())
-        .await;
+    let mut db = (**db).lock().unwrap();
 
+    let db_result = db.session_user_from_token(cookie.value().to_string()).await;
     if db_result.is_err() {
         return internal_server_error_response("db error".to_string());
     }
