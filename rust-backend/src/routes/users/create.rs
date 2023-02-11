@@ -18,12 +18,8 @@ pub async fn create(db: web::Data<Mutex<Db>>, req: web::Json<Request>) -> impl R
     let user_get_result = db.user_from_name(req.username.clone()).await;
     match user_get_result {
         Err(Error::NotFound) => {}
-        Ok(_) => {
-            return bad_request_response("invalid username".to_string());
-        }
-        Err(_) => {
-            return internal_server_error_response("db error".to_string());
-        }
+        Ok(_) => return bad_request_response("invalid username".to_string()),
+        Err(_) => return internal_server_error_response("db error".to_string()),
     }
 
     let Ok(hashed_password) = hash(req.password.clone(), DEFAULT_COST) else {

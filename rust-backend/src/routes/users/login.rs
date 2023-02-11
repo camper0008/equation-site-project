@@ -22,22 +22,14 @@ pub async fn login(db: web::Data<Mutex<Db>>, req: web::Json<Request>) -> impl Re
     let mut db = (**db).lock().await;
     let user = match db.user_from_name(req.username.clone()).await {
         Ok(user) => user,
-        Err(Error::NotFound) => {
-            return bad_request_response("invalid login".to_string());
-        }
-        Err(_) => {
-            return internal_server_error_response("db error".to_string());
-        }
+        Err(Error::NotFound) => return bad_request_response("invalid login".to_string()),
+        Err(_) => return internal_server_error_response("db error".to_string()),
     };
 
     match verify(req.password.clone(), &user.password) {
         Ok(true) => {}
-        Ok(false) => {
-            return bad_request_response("invalid login".to_string());
-        }
-        Err(_) => {
-            return internal_server_error_response("bcrypt error".to_string());
-        }
+        Ok(false) => return bad_request_response("invalid login".to_string()),
+        Err(_) => return internal_server_error_response("bcrypt error".to_string()),
     };
 
     let Ok(random_token_string) = gen_64_char_random_valid_string() else {

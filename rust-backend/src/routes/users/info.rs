@@ -30,12 +30,8 @@ pub async fn info(db: web::Data<Mutex<Db>>, req: HttpRequest) -> impl Responder 
 
     let user = match db.session_user_from_token(cookie).await {
         Ok(user) => user,
-        Err(db::Error::NotFound) => {
-            return bad_request_response("invalid cookie".to_string());
-        }
-        Err(_) => {
-            return internal_server_error_response("db error".to_string());
-        }
+        Err(db::Error::NotFound) => return bad_request_response("invalid cookie".to_string()),
+        Err(_) => return internal_server_error_response("db error".to_string()),
     };
 
     let user = User {

@@ -34,12 +34,8 @@ pub async fn edit(
 
     let user = match db.session_user_from_token(cookie).await {
         Ok(user) => user,
-        Err(db::Error::NotFound) => {
-            return bad_request_response("invalid cookie".to_string());
-        }
-        Err(_) => {
-            return internal_server_error_response("db error".to_string());
-        }
+        Err(db::Error::NotFound) => return bad_request_response("invalid cookie".to_string()),
+        Err(_) => return internal_server_error_response("db error".to_string()),
     };
 
     let (Permission::Contributor | Permission::Root) = user.permission else {
@@ -63,11 +59,9 @@ pub async fn edit(
                 ok: true,
                 msg: "success".to_string(),
             }),
-        Err(err) => match err {
-            db::Error::Duplicate => bad_request_response("invalid title".to_string()),
-            db::Error::NotFound => bad_request_response("invalid id".to_string()),
-            db::Error::OpenSSL => unreachable!("should never generate openssl error"),
-            db::Error::Custom(_) => internal_server_error_response("db error".to_string()),
-        },
+        Err(db::Error::Duplicate) => bad_request_response("invalid title".to_string()),
+        Err(db::Error::NotFound) => bad_request_response("invalid id".to_string()),
+        Err(db::Error::OpenSSL) => unreachable!("should never return openssl error"),
+        Err(db::Error::Custom(_)) => internal_server_error_response("db error".to_string()),
     }
 }

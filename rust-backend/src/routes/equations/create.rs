@@ -25,7 +25,7 @@ pub async fn create(
             return bad_request_response(match err {
                 cookie::Error::Malformed => "malformed cookie header".to_string(),
                 cookie::Error::NotIncluded => "cookie header not included".to_string(),
-            });
+            })
         }
     };
 
