@@ -2,8 +2,8 @@ use crate::database::db::Db;
 use crate::models::Equation;
 use crate::utils::{bad_request_response, internal_server_error_response};
 use actix_web::{get, http::header::ContentType, web, HttpResponse, Responder};
+use futures::lock::Mutex;
 use serde::Serialize;
-use std::sync::Mutex;
 
 #[derive(Serialize)]
 struct OneResponse {
@@ -16,7 +16,7 @@ struct OneResponse {
 pub async fn one(db: web::Data<Mutex<Db>>, post_id: web::Path<String>) -> impl Responder {
     let db_result = (**db)
         .lock()
-        .unwrap()
+        .await
         .equation_from_id(post_id.to_string())
         .await;
 

@@ -24,14 +24,14 @@ fn gen_random_valid_chars() -> Result<[char; 64], GenRandomError> {
         '2', '3', '4', '5', '6', '7', '8', '9',
     ];
 
+    // because a u8 goes from 0-255
+    const MAX_CHARACTERS: f64 = 255.0;
+
     let mut token_buffer = [0; 64];
     let res = rand_bytes(&mut token_buffer);
     if res.is_err() {
         return Err(GenRandomError::OpenSSLError);
     }
-
-    // because a u8 goes from 0-255
-    const MAX_CHARACTERS: f64 = 255.0;
 
     const CHARACTERS_MAX_INDEX: f64 = 61.0;
 
@@ -40,7 +40,7 @@ fn gen_random_valid_chars() -> Result<[char; 64], GenRandomError> {
     // this is because rand_bytes literally picks random bytes from 0-255, which sometimes include
     // control characters that are not allowed in headers, leading to an invalid header error
     Ok(token_buffer.map(|n| {
-        VALID_CHARACTERS[(((n as u64 as f64) / MAX_CHARACTERS) * CHARACTERS_MAX_INDEX) as usize]
+        VALID_CHARACTERS[(((u64::from(n) as f64) / MAX_CHARACTERS) * CHARACTERS_MAX_INDEX) as usize]
     }))
 }
 

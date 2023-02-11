@@ -267,7 +267,7 @@ impl MongoDb {
                     .build(),
             )
             .await
-            .map_err(|e| DbError::Custom(format!("title recieving error, {}", e)))?
+            .map_err(|e| DbError::Custom(format!("title recieving error, {e}")))?
             .try_collect()
             .await
             .map_err(|_| DbError::Custom("title collection error".to_string()))

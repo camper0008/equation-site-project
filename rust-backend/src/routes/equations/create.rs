@@ -4,8 +4,8 @@ use crate::utils::{
     bad_request_response, cookie_from_header, internal_server_error_response, CookieHeaderError,
 };
 use actix_web::{http::header::ContentType, post, web, HttpRequest, HttpResponse, Responder};
+use futures::lock::Mutex;
 use serde::Deserialize;
-use std::sync::Mutex;
 
 #[derive(Deserialize)]
 pub struct CreateRequest {
@@ -28,11 +28,9 @@ pub async fn create(
     };
     let cookie = cookie_result.ok().unwrap();
 
-    let user_get_result = (**db)
-        .lock()
-        .unwrap()
-        .session_user_from_token(cookie.value().to_string())
-        .await;
+    let mut db = (**db).lock().await;
+
+    let user_get_result = db.session_user_from_token(cookie.value().to_string()).await;
 
     if user_get_result.is_err() {
         return internal_server_error_response("db error".to_string());
@@ -49,11 +47,7 @@ pub async fn create(
         return bad_request_response("unauthorized".to_string());
     };
 
-    let equation_get_result = (**db)
-        .lock()
-        .unwrap()
-        .equation_from_title(body.title.clone())
-        .await;
+    let equation_get_result = db.equation_from_title(body.title.clone()).await;
 
     if equation_get_result.is_err() {
         return internal_server_error_response("db error".to_string());
@@ -70,7 +64,7 @@ pub async fn create(
         creator_id: user.id,
     };
 
-    match (**db).lock().unwrap().add_equation(equation).await {
+    match db.add_equation(equation).await {
         Ok(_) => HttpResponse::Ok()
             .insert_header(ContentType::json())
             .json(GenericResponse {

@@ -6,7 +6,7 @@ use crate::utils::{
 use actix_web::{
     cookie::Cookie, http::header::ContentType, post, web, HttpRequest, HttpResponse, Responder,
 };
-use std::sync::Mutex;
+use futures::lock::Mutex;
 
 #[post("/users/logout")]
 pub async fn logout(db: web::Data<Mutex<Db>>, req: HttpRequest) -> impl Responder {
@@ -19,7 +19,7 @@ pub async fn logout(db: web::Data<Mutex<Db>>, req: HttpRequest) -> impl Responde
     };
     let cookie = cookie_result.ok().unwrap();
 
-    let mut db = (**db).lock().unwrap();
+    let mut db = (**db).lock().await;
     let db_result = db.session_user_from_token(cookie.value().to_string()).await;
 
     if db_result.is_err() {

@@ -4,8 +4,8 @@ use crate::utils::{
     bad_request_response, cookie_from_header, internal_server_error_response, CookieHeaderError,
 };
 use actix_web::{http::header::ContentType, post, web, HttpRequest, HttpResponse, Responder};
+use futures::lock::Mutex;
 use serde::Deserialize;
-use std::sync::Mutex;
 
 #[derive(Deserialize)]
 pub struct EditRequest {
@@ -29,11 +29,9 @@ pub async fn edit(
     };
     let cookie = cookie_result.ok().unwrap();
 
-    let user_get_result = (**db)
-        .lock()
-        .unwrap()
-        .session_user_from_token(cookie.value().to_string())
-        .await;
+    let mut db = (**db).lock().await;
+
+    let user_get_result = db.session_user_from_token(cookie.value().to_string()).await;
 
     if user_get_result.is_err() {
         return internal_server_error_response("db error".to_string());
@@ -56,9 +54,7 @@ pub async fn edit(
         creator_id: user.id,
     };
 
-    match (**db)
-        .lock()
-        .unwrap()
+    match db
         .update_equation_from_id(equation, post_id.to_string())
         .await
     {

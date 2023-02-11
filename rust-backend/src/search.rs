@@ -96,10 +96,7 @@ fn levenshtein(a: &str, b: &str) -> usize {
     result
 }
 
-pub async fn search_equations(
-    db: &mut Db,
-    query: String,
-) -> Result<Vec<PreviewableEquation>, DbError> {
+pub async fn equations(db: &mut Db, query: String) -> Result<Vec<PreviewableEquation>, DbError> {
     let mut levenshteined = db
         .all_titles()
         .await?

@@ -4,8 +4,8 @@ use crate::utils::{
     bad_request_response, cookie_from_header, internal_server_error_response, CookieHeaderError,
 };
 use actix_web::{get, http::header::ContentType, web, HttpRequest, HttpResponse, Responder};
+use futures::lock::Mutex;
 use serde::Serialize;
-use std::sync::Mutex;
 
 #[derive(Serialize)]
 struct InfoResponse {
@@ -25,7 +25,7 @@ pub async fn info(db: web::Data<Mutex<Db>>, req: HttpRequest) -> impl Responder 
     }
     let cookie = cookie_result.ok().unwrap();
 
-    let mut db = (**db).lock().unwrap();
+    let mut db = (**db).lock().await;
 
     let db_result = db.session_user_from_token(cookie.value().to_string()).await;
     if db_result.is_err() {

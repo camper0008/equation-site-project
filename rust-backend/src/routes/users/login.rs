@@ -9,18 +9,18 @@ use actix_web::{
     post, web, HttpResponse, Responder,
 };
 use bcrypt::verify;
+use futures::lock::Mutex;
 use serde::Deserialize;
-use std::sync::Mutex;
 
 #[derive(Deserialize)]
-pub struct LoginRequest {
+pub struct Request {
     username: String,
     password: String,
 }
 
 #[post("/users/login")]
-pub async fn login(db: web::Data<Mutex<Db>>, req: web::Json<LoginRequest>) -> impl Responder {
-    let mut db = (**db).lock().unwrap();
+pub async fn login(db: web::Data<Mutex<Db>>, req: web::Json<Request>) -> impl Responder {
+    let mut db = (**db).lock().await;
     let result = db.user_from_name(req.username.clone()).await;
 
     if result.is_err() {
