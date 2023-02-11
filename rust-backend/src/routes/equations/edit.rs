@@ -19,32 +19,31 @@ pub async fn edit(
     body: web::Json<Request>,
     post_id: web::Path<String>,
 ) -> impl Responder {
-    let cookie_result = cookie_from_header(req.headers());
-    if cookie_result.is_err() {
-        return bad_request_response(match cookie_result.err().unwrap() {
-            CookieHeaderError::Malformed => "malformed cookie header".to_string(),
-            CookieHeaderError::NotIncluded => "cookie header not included".to_string(),
-        });
+    let cookie = match cookie_from_header(req.headers()) {
+        Ok(cookie) => cookie.value().to_string(),
+        Err(err) => {
+            return bad_request_response(match err {
+                CookieHeaderError::Malformed => "malformed cookie header".to_string(),
+                CookieHeaderError::NotIncluded => "cookie header not included".to_string(),
+            });
+        }
     };
-    let cookie = cookie_result.ok().unwrap();
 
     let mut db = (**db).lock().await;
 
-    let user_get_result = db.session_user_from_token(cookie.value().to_string()).await;
+    let user = match db.session_user_from_token(cookie).await {
+        Ok(user) => user,
+        Err(Error::NotFound) => {
+            return bad_request_response("invalid cookie".to_string());
+        }
+        Err(_) => {
+            return internal_server_error_response("db error".to_string());
+        }
+    };
 
-    if user_get_result.is_err() {
-        return internal_server_error_response("db error".to_string());
-    }
-
-    let found_user = user_get_result.ok().unwrap();
-    if found_user.is_none() {
-        return bad_request_response("invalid cookie".to_string());
-    }
-
-    let user = found_user.unwrap();
-
-    if user.permission != Permission::Contributor && user.permission != Permission::Root {
+    let (Permission::Contributor | Permission::Root) = user.permission else {
         return bad_request_response("unauthorized".to_string());
+
     };
 
     let equation = InsertableDbEquation {
@@ -66,6 +65,7 @@ pub async fn edit(
         Err(err) => match err {
             Error::Duplicate => bad_request_response("invalid title".to_string()),
             Error::NotFound => bad_request_response("invalid id".to_string()),
+            Error::OpenSSL => unreachable!("should never generate openssl error"),
             Error::Custom(_) => internal_server_error_response("db error".to_string()),
         },
     }

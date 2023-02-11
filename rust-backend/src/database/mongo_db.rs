@@ -113,7 +113,7 @@ impl MongoDb {
         Ok(())
     }
 
-    pub async fn user_from_name(&self, username: String) -> Result<Option<DbUser>, Error> {
+    pub async fn user_from_name(&self, username: String) -> Result<DbUser, Error> {
         let collection: Collection<DbUser> =
             self.client.database(&self.db_name).collection("users");
 
@@ -121,8 +121,8 @@ impl MongoDb {
             .find_one(doc! { "username": username }, None)
             .await
         {
-            Ok(Some(user)) => Ok(Some(user)),
-            Ok(None) => Ok(None),
+            Ok(Some(user)) => Ok(user),
+            Ok(None) => Err(Error::NotFound),
             Err(err) => Err(Error::Custom(err.to_string())),
         }
     }
@@ -208,22 +208,23 @@ impl MongoDb {
         Ok(())
     }
 
-    pub async fn equation_from_id(&self, id: String) -> Result<Option<DbEquation>, Error> {
+    pub async fn equation_from_id(&self, id: String) -> Result<DbEquation, Error> {
         let collection: Collection<DbEquation> =
             self.client.database(&self.db_name).collection("equations");
+
         match collection.find_one(doc! { "id": id }, None).await {
-            Ok(Some(equation)) => Ok(Some(equation)),
-            Ok(None) => Ok(None),
+            Ok(Some(equation)) => Ok(equation),
+            Ok(None) => Err(Error::NotFound),
             Err(err) => Err(Error::Custom(err.to_string())),
         }
     }
 
-    pub async fn equation_from_title(&self, title: String) -> Result<Option<DbEquation>, Error> {
+    pub async fn equation_from_title(&self, title: String) -> Result<DbEquation, Error> {
         let collection: Collection<DbEquation> =
             self.client.database(&self.db_name).collection("equations");
         match collection.find_one(doc! { "title": title }, None).await {
-            Ok(Some(equation)) => Ok(Some(equation)),
-            Ok(None) => Ok(None),
+            Ok(Some(equation)) => Ok(equation),
+            Ok(None) => Err(Error::NotFound),
             Err(err) => Err(Error::Custom(err.to_string())),
         }
     }

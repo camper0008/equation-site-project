@@ -1,5 +1,5 @@
 use crate::char_generation::gen_64_char_random_valid_string;
-use crate::database::db::Db;
+use crate::database::db::{Db, Error};
 use crate::models::{GenericResponse, InsertableDbSession};
 use crate::response_helper::{bad_request_response, internal_server_error_response};
 use actix_web::{
@@ -20,40 +20,36 @@ pub struct Request {
 #[post("/users/login")]
 pub async fn login(db: web::Data<Mutex<Db>>, req: web::Json<Request>) -> impl Responder {
     let mut db = (**db).lock().await;
-    let result = db.user_from_name(req.username.clone()).await;
-
-    if result.is_err() {
-        return internal_server_error_response("db error".to_string());
-    }
-
-    let found = result.ok().unwrap();
-    if found.is_none() {
-        return bad_request_response("invalid login".to_string());
-    }
-    let user = found.unwrap();
-    let bcrypt_res = verify(req.password.clone(), &user.password);
-    if bcrypt_res.is_err() {
-        return internal_server_error_response("bcrypt error".to_string());
+    let user = match db.user_from_name(req.username.clone()).await {
+        Ok(user) => user,
+        Err(Error::NotFound) => {
+            return bad_request_response("invalid login".to_string());
+        }
+        Err(_) => {
+            return internal_server_error_response("db error".to_string());
+        }
     };
 
-    let matches = bcrypt_res.unwrap();
-    if !matches {
-        return bad_request_response("invalid login".to_string());
+    match verify(req.password.clone(), &user.password) {
+        Ok(true) => {}
+        Ok(false) => {
+            return bad_request_response("invalid login".to_string());
+        }
+        Err(_) => {
+            return internal_server_error_response("bcrypt error".to_string());
+        }
     };
 
-    let random_string_result = gen_64_char_random_valid_string();
-    if random_string_result.is_err() {
+    let Ok(random_token_string) = gen_64_char_random_valid_string() else {
         return internal_server_error_response("openssl error".to_string());
     };
 
-    let random_token_string = random_string_result.unwrap();
     let session = InsertableDbSession {
         user_id: user.id,
-        token: random_token_string.to_string(),
+        token: random_token_string.clone(),
     };
 
-    let db_result = db.add_session(session).await;
-    if db_result.is_err() {
+    if let Err(_) = db.add_session(session).await {
         return internal_server_error_response("db error".to_string());
     };
 

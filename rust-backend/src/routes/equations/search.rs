@@ -17,15 +17,12 @@ pub async fn search(db: web::Data<Mutex<Db>>, title: web::Path<String>) -> impl 
     let mut db = (**db).lock().await;
 
     let equations_result = equations(&mut db, title.to_string()).await;
-
-    if equations_result.is_err() {
-        return internal_server_error_response(format!(
-            "db error: {:?}",
-            equations_result.err().unwrap()
-        ));
-    }
-
-    let equations = equations_result.ok().unwrap();
+    let equations = match equations_result {
+        Ok(equations) => equations,
+        Err(_) => {
+            return internal_server_error_response("db error".to_string());
+        }
+    };
 
     HttpResponse::Ok()
         .insert_header(ContentType::json())

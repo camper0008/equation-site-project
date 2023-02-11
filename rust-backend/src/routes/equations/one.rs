@@ -1,3 +1,4 @@
+use crate::database::db::Error;
 use crate::models::Equation;
 use crate::response_helper::bad_request_response;
 use crate::{database::db::Db, response_helper::internal_server_error_response};
@@ -14,28 +15,24 @@ struct OneResponse {
 
 #[get("/equations/one/{post_id}")]
 pub async fn one(db: web::Data<Mutex<Db>>, post_id: web::Path<String>) -> impl Responder {
-    let db_result = (**db)
-        .lock()
-        .await
-        .equation_from_id(post_id.to_string())
-        .await;
+    let db = (**db).lock().await;
 
-    if db_result.is_err() {
-        return internal_server_error_response("db error".to_string());
-    }
+    let equation = match db.equation_from_id(post_id.to_string()).await {
+        Ok(equation) => equation,
+        Err(Error::NotFound) => {
+            return bad_request_response("invalid id".to_string());
+        }
+        Err(_) => {
+            return internal_server_error_response("db error".to_string());
+        }
+    };
 
-    let found_equation_option = db_result.ok().unwrap();
-    if found_equation_option.is_none() {
-        return bad_request_response("invalid id".to_string());
-    }
-
-    let found_equation = found_equation_option.unwrap();
     let equation = Equation {
-        id: found_equation.id,
-        title: found_equation.title,
-        content: found_equation.content,
-        date_created: found_equation.date_created,
-        creator_id: found_equation.creator_id,
+        id: equation.id,
+        title: equation.title,
+        content: equation.content,
+        date_created: equation.date_created,
+        creator_id: equation.creator_id,
     };
 
     HttpResponse::Ok()

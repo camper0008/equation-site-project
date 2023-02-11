@@ -16,27 +16,27 @@ pub struct Request {
 pub async fn create(db: web::Data<Mutex<Db>>, req: web::Json<Request>) -> impl Responder {
     let mut db = (**db).lock().await;
     let user_get_result = db.user_from_name(req.username.clone()).await;
-
-    if user_get_result.is_err() {
-        return internal_server_error_response("db error".to_string());
+    match user_get_result {
+        Err(Error::NotFound) => {}
+        Ok(_) => {
+            return bad_request_response("invalid username".to_string());
+        }
+        Err(_) => {
+            return internal_server_error_response("db error".to_string());
+        }
     }
 
-    let found = user_get_result.ok().unwrap();
-    if found.is_some() {
-        return bad_request_response("invalid username".to_string());
+    let hashed_password = match hash(req.password.clone(), DEFAULT_COST) {
+        Ok(hashed) => hashed,
+        Err(_) => {
+            return internal_server_error_response("bcrypt error".to_string());
+        }
     };
-
-    let bcrypt_res = hash(req.password.clone(), DEFAULT_COST);
-    if bcrypt_res.is_err() {
-        return internal_server_error_response("bcrypt error".to_string());
-    };
-
-    let hashed = bcrypt_res.unwrap();
 
     let user = InsertableDbUser {
         username: req.username.clone(),
         permission: Permission::User,
-        password: hashed,
+        password: hashed_password,
     };
 
     match db.add_user(user).await {
