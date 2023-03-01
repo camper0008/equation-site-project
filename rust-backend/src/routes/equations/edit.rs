@@ -15,7 +15,7 @@ pub struct Request {
 
 #[post("/equations/edit/{post_id}")]
 pub async fn edit(
-    db: web::Data<Mutex<Db>>,
+    db: web::Data<Mutex<dyn Db>>,
     req: HttpRequest,
     body: web::Json<Request>,
     post_id: web::Path<String>,
@@ -24,8 +24,8 @@ pub async fn edit(
         Ok(cookie) => cookie.value().to_string(),
         Err(err) => {
             return bad_request_response(match err {
-                cookie::Error::Malformed => "malformed cookie header".to_string(),
-                cookie::Error::NotIncluded => "cookie header not included".to_string(),
+                cookie::Error::Malformed => "malformed cookie header",
+                cookie::Error::NotIncluded => "cookie header not included",
             });
         }
     };
@@ -34,12 +34,12 @@ pub async fn edit(
 
     let user = match db.session_user_from_token(cookie).await {
         Ok(user) => user,
-        Err(db::Error::NotFound) => return bad_request_response("invalid cookie".to_string()),
-        Err(_) => return internal_server_error_response("db error".to_string()),
+        Err(db::Error::NotFound) => return bad_request_response("invalid cookie"),
+        Err(_) => return internal_server_error_response("db error"),
     };
 
     let (Permission::Contributor | Permission::Root) = user.permission else {
-        return bad_request_response("unauthorized".to_string());
+        return bad_request_response("unauthorized");
 
     };
 
@@ -57,11 +57,11 @@ pub async fn edit(
             .insert_header(ContentType::json())
             .json(GenericResponse {
                 ok: true,
-                msg: "success".to_string(),
+                msg: "success",
             }),
-        Err(db::Error::Duplicate) => bad_request_response("invalid title".to_string()),
-        Err(db::Error::NotFound) => bad_request_response("invalid id".to_string()),
+        Err(db::Error::Duplicate) => bad_request_response("invalid title"),
+        Err(db::Error::NotFound) => bad_request_response("invalid id"),
         Err(db::Error::OpenSSL) => unreachable!("should never return openssl error"),
-        Err(db::Error::Custom(_)) => internal_server_error_response("db error".to_string()),
+        Err(db::Error::Custom(_)) => internal_server_error_response("db error"),
     }
 }

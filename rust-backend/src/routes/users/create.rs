@@ -13,17 +13,17 @@ pub struct Request {
 }
 
 #[post("/users/create")]
-pub async fn create(db: web::Data<Mutex<Db>>, req: web::Json<Request>) -> impl Responder {
+pub async fn create(db: web::Data<Mutex<dyn Db>>, req: web::Json<Request>) -> impl Responder {
     let mut db = (**db).lock().await;
     let user_get_result = db.user_from_name(req.username.clone()).await;
     match user_get_result {
         Err(Error::NotFound) => {}
-        Ok(_) => return bad_request_response("invalid username".to_string()),
-        Err(_) => return internal_server_error_response("db error".to_string()),
+        Ok(_) => return bad_request_response("invalid username"),
+        Err(_) => return internal_server_error_response("db error"),
     }
 
     let Ok(hashed_password) = hash(req.password.clone(), DEFAULT_COST) else {
-        return internal_server_error_response("bcrypt error".to_string());
+        return internal_server_error_response("bcrypt error");
     };
 
     let user = InsertableDbUser {
@@ -37,11 +37,11 @@ pub async fn create(db: web::Data<Mutex<Db>>, req: web::Json<Request>) -> impl R
             .insert_header(ContentType::json())
             .json(GenericResponse {
                 ok: true,
-                msg: "success".to_string(),
+                msg: "success",
             }),
         Err(err) => match err {
-            Error::Duplicate => bad_request_response("invalid username".to_string()),
-            _ => internal_server_error_response("db error".to_string()),
+            Error::Duplicate => bad_request_response("invalid username"),
+            _ => internal_server_error_response("db error"),
         },
     }
 }

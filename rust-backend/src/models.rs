@@ -3,8 +3,8 @@ use serde::{Deserialize, Serialize};
 pub type SessionToken = String;
 
 #[derive(Serialize)]
-pub struct GenericResponse {
-    pub msg: String,
+pub struct GenericResponse<'a> {
+    pub msg: &'a str,
     pub ok: bool,
 }
 

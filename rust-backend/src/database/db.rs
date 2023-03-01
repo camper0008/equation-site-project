@@ -1,4 +1,8 @@
-use crate::database::mongo_db::MongoDb;
+use crate::models::{
+    DbEquation, DbSession, DbUser, InsertableDbEquation, InsertableDbSession, InsertableDbUser,
+    PreviewableEquation, SessionToken,
+};
+use async_trait::async_trait;
 
 #[derive(Debug)]
 pub enum Error {
@@ -23,4 +27,23 @@ impl From<mongodb::error::Error> for Error {
     }
 }
 
-pub type Db = MongoDb;
+#[async_trait]
+pub trait Db {
+    async fn add_user(&mut self, insertable_user: InsertableDbUser) -> Result<(), Error>;
+    async fn user_from_name(&self, username: String) -> Result<DbUser, Error>;
+    async fn add_equation(
+        &mut self,
+        insertable_equation: InsertableDbEquation,
+    ) -> Result<(), Error>;
+    async fn update_equation_from_id(
+        &mut self,
+        insertable_equation: InsertableDbEquation,
+        post_id: String,
+    ) -> Result<(), Error>;
+    async fn equation_from_id(&self, id: String) -> Result<DbEquation, Error>;
+    async fn equation_from_title(&self, title: String) -> Result<DbEquation, Error>;
+    async fn all_titles(&self) -> Result<Vec<PreviewableEquation>, Error>;
+    async fn add_session(&mut self, insertable_session: InsertableDbSession) -> Result<(), Error>;
+    async fn session_user_from_token(&mut self, token: SessionToken) -> Result<DbUser, Error>;
+    async fn delete_user_session(&mut self, token: SessionToken) -> Result<DbSession, Error>;
+}

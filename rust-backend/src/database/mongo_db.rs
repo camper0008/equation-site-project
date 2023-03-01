@@ -5,12 +5,15 @@ use crate::models::{
     DbEquation, DbSession, DbUser, InsertableDbEquation, InsertableDbSession, InsertableDbUser,
     PreviewableEquation, SessionToken,
 };
+use async_trait::async_trait;
 use futures::TryStreamExt;
 use mongodb::{
     bson::doc, options::FindOptions, options::IndexOptions, Client, Collection, IndexModel,
 };
 use std::convert::From;
 use std::time::Duration;
+
+use super::db::Db;
 
 async fn create_session_expire_index(client: &Client, db_name: &str) {
     let options = IndexOptions::builder()
@@ -84,8 +87,11 @@ impl MongoDb {
 
         Self { client, db_name }
     }
+}
 
-    pub async fn add_user(&mut self, insertable_user: InsertableDbUser) -> Result<(), Error> {
+#[async_trait]
+impl Db for MongoDb {
+    async fn add_user(&mut self, insertable_user: InsertableDbUser) -> Result<(), Error> {
         let collection: Collection<DbUser> =
             self.client.database(&self.db_name).collection("users");
 
@@ -110,7 +116,7 @@ impl MongoDb {
         Ok(())
     }
 
-    pub async fn user_from_name(&self, username: String) -> Result<DbUser, Error> {
+    async fn user_from_name(&self, username: String) -> Result<DbUser, Error> {
         let collection: Collection<DbUser> =
             self.client.database(&self.db_name).collection("users");
 
@@ -124,7 +130,7 @@ impl MongoDb {
         }
     }
 
-    pub async fn add_equation(
+    async fn add_equation(
         &mut self,
         insertable_equation: InsertableDbEquation,
     ) -> Result<(), Error> {
@@ -155,7 +161,7 @@ impl MongoDb {
         Ok(())
     }
 
-    pub async fn update_equation_from_id(
+    async fn update_equation_from_id(
         &mut self,
         insertable_equation: InsertableDbEquation,
         post_id: String,
@@ -192,7 +198,7 @@ impl MongoDb {
         Ok(())
     }
 
-    pub async fn equation_from_id(&self, id: String) -> Result<DbEquation, Error> {
+    async fn equation_from_id(&self, id: String) -> Result<DbEquation, Error> {
         let collection: Collection<DbEquation> =
             self.client.database(&self.db_name).collection("equations");
 
@@ -203,7 +209,7 @@ impl MongoDb {
         }
     }
 
-    pub async fn equation_from_title(&self, title: String) -> Result<DbEquation, Error> {
+    async fn equation_from_title(&self, title: String) -> Result<DbEquation, Error> {
         let collection: Collection<DbEquation> =
             self.client.database(&self.db_name).collection("equations");
         match collection.find_one(doc! { "title": title }, None).await {
@@ -213,7 +219,7 @@ impl MongoDb {
         }
     }
 
-    pub async fn all_titles(&self) -> Result<Vec<PreviewableEquation>, Error> {
+    async fn all_titles(&self) -> Result<Vec<PreviewableEquation>, Error> {
         self.client
             .database(&self.db_name)
             .collection("equations")
@@ -230,10 +236,7 @@ impl MongoDb {
             .map_err(|_| Error::Custom("title collection error".to_string()))
     }
 
-    pub async fn add_session(
-        &mut self,
-        insertable_session: InsertableDbSession,
-    ) -> Result<(), Error> {
+    async fn add_session(&mut self, insertable_session: InsertableDbSession) -> Result<(), Error> {
         let collection: Collection<DbSession> =
             self.client.database(&self.db_name).collection("sessions");
 
@@ -250,7 +253,7 @@ impl MongoDb {
         }
     }
 
-    pub async fn session_user_from_token(&mut self, token: SessionToken) -> Result<DbUser, Error> {
+    async fn session_user_from_token(&mut self, token: SessionToken) -> Result<DbUser, Error> {
         let session_collection: Collection<DbSession> =
             self.client.database(&self.db_name).collection("sessions");
         let session = match session_collection
@@ -275,7 +278,7 @@ impl MongoDb {
         }
     }
 
-    pub async fn delete_user_session(&mut self, token: SessionToken) -> Result<DbSession, Error> {
+    async fn delete_user_session(&mut self, token: SessionToken) -> Result<DbSession, Error> {
         let collection: Collection<DbSession> =
             self.client.database(&self.db_name).collection("sessions");
         match collection

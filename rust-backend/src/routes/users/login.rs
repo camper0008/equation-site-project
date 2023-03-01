@@ -18,22 +18,22 @@ pub struct Request {
 }
 
 #[post("/users/login")]
-pub async fn login(db: web::Data<Mutex<Db>>, req: web::Json<Request>) -> impl Responder {
+pub async fn login(db: web::Data<Mutex<dyn Db>>, req: web::Json<Request>) -> impl Responder {
     let mut db = (**db).lock().await;
     let user = match db.user_from_name(req.username.clone()).await {
         Ok(user) => user,
-        Err(Error::NotFound) => return bad_request_response("invalid login".to_string()),
-        Err(_) => return internal_server_error_response("db error".to_string()),
+        Err(Error::NotFound) => return bad_request_response("invalid login"),
+        Err(_) => return internal_server_error_response("db error"),
     };
 
     match verify(req.password.clone(), &user.password) {
         Ok(true) => {}
-        Ok(false) => return bad_request_response("invalid login".to_string()),
-        Err(_) => return internal_server_error_response("bcrypt error".to_string()),
+        Ok(false) => return bad_request_response("invalid login"),
+        Err(_) => return internal_server_error_response("bcrypt error"),
     };
 
     let Ok(random_token_string) = gen_64_char_random_valid_string() else {
-        return internal_server_error_response("openssl error".to_string());
+        return internal_server_error_response("openssl error");
     };
 
     let session = InsertableDbSession {
@@ -42,7 +42,7 @@ pub async fn login(db: web::Data<Mutex<Db>>, req: web::Json<Request>) -> impl Re
     };
 
     if db.add_session(session).await.is_err() {
-        return internal_server_error_response("db error".to_string());
+        return internal_server_error_response("db error");
     };
 
     HttpResponse::Ok()
@@ -57,6 +57,6 @@ pub async fn login(db: web::Data<Mutex<Db>>, req: web::Json<Request>) -> impl Re
         )
         .json(GenericResponse {
             ok: true,
-            msg: "success".to_string(),
+            msg: "success",
         })
 }

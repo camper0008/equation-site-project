@@ -1,7 +1,8 @@
-use crate::database::db::{Db, Error};
-use crate::models::PreviewableEquation;
 use std::cmp::Ordering;
 
+use crate::models::PreviewableEquation;
+
+#[derive(Eq)]
 struct PrevEqWithLevDist {
     pub id: String,
     pub title: String,
@@ -26,8 +27,6 @@ impl PartialEq for PrevEqWithLevDist {
         (self.lev_dist) == (other.lev_dist)
     }
 }
-
-impl Eq for PrevEqWithLevDist {}
 
 fn levenshtein(a: &str, b: &str) -> usize {
     /*
@@ -96,10 +95,11 @@ fn levenshtein(a: &str, b: &str) -> usize {
     result
 }
 
-pub async fn equations(db: &mut Db, query: String) -> Result<Vec<PreviewableEquation>, Error> {
-    let mut levenshteined: Vec<PrevEqWithLevDist> = db
-        .all_titles()
-        .await?
+pub fn equations<T>(titles: T, query: String) -> Vec<PreviewableEquation>
+where
+    T: IntoIterator<Item = PreviewableEquation>,
+{
+    let mut levenshteined: Vec<PrevEqWithLevDist> = titles
         .into_iter()
         .map(|eq| PrevEqWithLevDist {
             id: eq.id,
@@ -108,8 +108,10 @@ pub async fn equations(db: &mut Db, query: String) -> Result<Vec<PreviewableEqua
             lev_dist: levenshtein(&eq.title, &query),
         })
         .collect();
+
     levenshteined.sort_unstable();
-    Ok(levenshteined
+
+    levenshteined
         .into_iter()
         .take(100)
         .map(|eq| PreviewableEquation {
@@ -117,5 +119,5 @@ pub async fn equations(db: &mut Db, query: String) -> Result<Vec<PreviewableEqua
             title: eq.title,
             date_created: eq.date_created,
         })
-        .collect())
+        .collect()
 }
