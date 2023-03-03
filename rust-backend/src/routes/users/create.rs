@@ -1,9 +1,8 @@
-use crate::database::db::{Db, Error};
+use crate::database::db::{DbParam, Error};
 use crate::models::{GenericResponse, InsertableDbUser, Permission};
 use crate::response_helper::{bad_request_response, internal_server_error_response};
 use actix_web::{http::header::ContentType, post, web, HttpResponse, Responder};
 use bcrypt::{hash, DEFAULT_COST};
-use futures::lock::Mutex;
 use serde::Deserialize;
 
 #[derive(Deserialize)]
@@ -13,7 +12,7 @@ pub struct Request {
 }
 
 #[post("/users/create")]
-pub async fn create(db: web::Data<Mutex<dyn Db>>, req: web::Json<Request>) -> impl Responder {
+pub async fn create(db: web::Data<DbParam>, req: web::Json<Request>) -> impl Responder {
     let mut db = (**db).lock().await;
     let user_get_result = db.user_from_name(req.username.clone()).await;
     match user_get_result {

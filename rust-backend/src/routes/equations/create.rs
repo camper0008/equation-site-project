@@ -1,10 +1,8 @@
 use crate::cookie;
-use crate::database::db;
-use crate::database::db::Db;
+use crate::database::db::{self, DbParam};
 use crate::models::{GenericResponse, InsertableDbEquation, Permission};
 use crate::response_helper::{bad_request_response, internal_server_error_response};
 use actix_web::{http::header::ContentType, post, web, HttpRequest, HttpResponse, Responder};
-use futures::lock::Mutex;
 use serde::Deserialize;
 
 #[derive(Deserialize)]
@@ -15,7 +13,7 @@ pub struct Request {
 
 #[post("/equations/create")]
 pub async fn create(
-    db: web::Data<Mutex<dyn Db>>,
+    db: web::Data<DbParam>,
     req: HttpRequest,
     body: web::Json<Request>,
 ) -> impl Responder {

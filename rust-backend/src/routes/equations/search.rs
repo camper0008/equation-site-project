@@ -1,7 +1,7 @@
+use crate::database::db::DbParam;
 use crate::models::PreviewableEquation;
-use crate::{database::db::Db, response_helper::internal_server_error_response, search::equations};
+use crate::{response_helper::internal_server_error_response, search::equations};
 use actix_web::{get, http::header::ContentType, web, HttpResponse, Responder};
-use futures::lock::Mutex;
 use serde::Serialize;
 
 #[derive(Serialize)]
@@ -12,7 +12,7 @@ struct SearchResponse<'a> {
 }
 
 #[get("/equations/search/{title}")]
-pub async fn search(db: web::Data<Mutex<dyn Db>>, title: web::Path<String>) -> impl Responder {
+pub async fn search(db: web::Data<DbParam>, title: web::Path<String>) -> impl Responder {
     let db = (**db).lock().await;
 
     let Ok(titles) = db.all_titles().await else {

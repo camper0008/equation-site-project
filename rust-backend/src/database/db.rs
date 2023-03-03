@@ -3,6 +3,9 @@ use crate::models::{
     PreviewableEquation, SessionToken,
 };
 use async_trait::async_trait;
+use futures::lock::Mutex;
+
+pub type DbParam = Mutex<dyn Db + Send + Sync>;
 
 #[derive(Debug)]
 pub enum Error {

@@ -1,6 +1,5 @@
 use crate::cookie;
-use crate::database::db;
-use crate::database::db::Db;
+use crate::database::db::{self, DbParam};
 use crate::models::GenericResponse;
 use crate::response_helper::{bad_request_response, internal_server_error_response};
 use actix_web::{
@@ -8,10 +7,9 @@ use actix_web::{
     http::header::ContentType,
     post, web, HttpRequest, HttpResponse, Responder,
 };
-use futures::lock::Mutex;
 
 #[post("/users/logout")]
-pub async fn logout(db: web::Data<Mutex<dyn Db>>, req: HttpRequest) -> impl Responder {
+pub async fn logout(db: web::Data<DbParam>, req: HttpRequest) -> impl Responder {
     let cookie = match cookie::from_header(req.headers()) {
         Ok(cookie) => cookie.value().to_string(),
         Err(err) => {

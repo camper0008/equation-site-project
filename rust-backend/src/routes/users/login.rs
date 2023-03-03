@@ -1,5 +1,5 @@
 use crate::char_generation::gen_64_char_random_valid_string;
-use crate::database::db::{Db, Error};
+use crate::database::db::{DbParam, Error};
 use crate::models::{GenericResponse, InsertableDbSession};
 use crate::response_helper::{bad_request_response, internal_server_error_response};
 use actix_web::{
@@ -8,7 +8,6 @@ use actix_web::{
     post, web, HttpResponse, Responder,
 };
 use bcrypt::verify;
-use futures::lock::Mutex;
 use serde::Deserialize;
 
 #[derive(Deserialize)]
@@ -18,7 +17,7 @@ pub struct Request {
 }
 
 #[post("/users/login")]
-pub async fn login(db: web::Data<Mutex<dyn Db>>, req: web::Json<Request>) -> impl Responder {
+pub async fn login(db: web::Data<DbParam>, req: web::Json<Request>) -> impl Responder {
     let mut db = (**db).lock().await;
     let user = match db.user_from_name(req.username.clone()).await {
         Ok(user) => user,

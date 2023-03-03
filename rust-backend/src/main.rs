@@ -1,7 +1,10 @@
+use crate::database::db::DbParam;
 use crate::database::mongo_db::MongoDb;
 use actix_cors::Cors;
 use actix_web::{web::Data, App, HttpServer};
-use std::{env, sync::Mutex};
+use futures::lock::Mutex;
+use std::env;
+use std::sync::Arc;
 
 mod char_generation;
 mod cookie;
@@ -24,9 +27,12 @@ async fn main() -> std::io::Result<()> {
     let db = MongoDb::new(uri.to_string(), "equation-site-project".to_string()).await;
     println!("MongoDB connected");
 
+    let db: Arc<DbParam> = Arc::new(Mutex::new(db));
+    let db: Data<DbParam> = Data::from(db);
+
     HttpServer::new(move || {
         App::new()
-            .app_data(Data::new(Mutex::new(db.clone())))
+            .app_data(db.clone())
             // TODO: set proper cors settings
             .wrap(Cors::permissive())
             .service(users::login::login)

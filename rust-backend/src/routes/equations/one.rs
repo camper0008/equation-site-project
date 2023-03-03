@@ -1,9 +1,8 @@
-use crate::database::db::Error;
+use crate::database::db::{DbParam, Error};
 use crate::models::Equation;
 use crate::response_helper::bad_request_response;
-use crate::{database::db::Db, response_helper::internal_server_error_response};
+use crate::response_helper::internal_server_error_response;
 use actix_web::{get, http::header::ContentType, web, HttpResponse, Responder};
-use futures::lock::Mutex;
 use serde::Serialize;
 
 #[derive(Serialize)]
@@ -14,7 +13,7 @@ struct OneResponse<'a> {
 }
 
 #[get("/equations/one/{post_id}")]
-pub async fn one(db: web::Data<Mutex<dyn Db>>, post_id: web::Path<String>) -> impl Responder {
+pub async fn one(db: web::Data<DbParam>, post_id: web::Path<String>) -> impl Responder {
     let db = (**db).lock().await;
 
     let equation = match db.equation_from_id(post_id.to_string()).await {
