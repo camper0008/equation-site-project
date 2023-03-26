@@ -71,7 +71,6 @@ async fn create_unique_username_index(client: &Client, db_name: &str) {
         .expect("creating an index should succeed");
 }
 
-#[derive(Clone)]
 pub struct MongoDb {
     client: Client,
     db_name: String,
@@ -278,14 +277,11 @@ impl Db for MongoDb {
         }
     }
 
-    async fn delete_user_session(&mut self, token: SessionToken) -> Result<DbSession, Error> {
+    async fn delete_user_session(&mut self, token: SessionToken) -> Result<(), Error> {
         let collection: Collection<DbSession> =
             self.client.database(&self.db_name).collection("sessions");
-        match collection
-            .find_one_and_delete(doc! { "token": token }, None)
-            .await
-        {
-            Ok(Some(session)) => Ok(session),
+        match collection.delete_one(doc! { "token": token }, None).await {
+            Ok(Some(session)) => Ok(()),
             Ok(None) => Err(Error::NotFound),
             Err(err) => Err(Error::from(err)),
         }

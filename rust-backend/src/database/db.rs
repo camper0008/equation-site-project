@@ -1,5 +1,5 @@
 use crate::models::{
-    DbEquation, DbSession, DbUser, InsertableDbEquation, InsertableDbSession, InsertableDbUser,
+    DbEquation, DbUser, InsertableDbEquation, InsertableDbSession, InsertableDbUser,
     PreviewableEquation, SessionToken,
 };
 use async_trait::async_trait;
@@ -12,6 +12,7 @@ pub enum Error {
     Duplicate,
     NotFound,
     OpenSSL,
+    Network,
     Custom(String),
 }
 
@@ -21,6 +22,7 @@ impl From<openssl::error::ErrorStack> for Error {
     }
 }
 
+#[cfg(feature = "mongo")]
 impl From<mongodb::error::Error> for Error {
     fn from(err: mongodb::error::Error) -> Self {
         match *err.kind {
@@ -48,5 +50,5 @@ pub trait Db {
     async fn all_titles(&self) -> Result<Vec<PreviewableEquation>, Error>;
     async fn add_session(&mut self, insertable_session: InsertableDbSession) -> Result<(), Error>;
     async fn session_user_from_token(&mut self, token: SessionToken) -> Result<DbUser, Error>;
-    async fn delete_user_session(&mut self, token: SessionToken) -> Result<DbSession, Error>;
+    async fn delete_user_session(&mut self, token: SessionToken) -> Result<(), Error>;
 }

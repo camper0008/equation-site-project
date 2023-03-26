@@ -64,7 +64,7 @@ pub struct InsertableDbSession {
     pub user_id: String,
 }
 
-#[derive(Serialize, Deserialize, PartialEq)]
+#[derive(Serialize, Deserialize, PartialEq, sqlx::Type)]
 pub enum Permission {
     User,
     Contributor,

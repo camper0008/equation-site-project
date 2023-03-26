@@ -10,9 +10,15 @@ actix-web = "4"
 actix-cors = "0.6.1"
 serde = { version = "1.0", features = ["derive"] }
 futures = "0.3.21"
-mongodb = "2.0.0"
+mongodb = { version = "2.0.0", optional = true }
 bcrypt = "0.12"
 openssl = "0.10.38"
 chrono = "0.4"
 dotenv = "0.15"
-async-trait = "0.1.64"
+sqlx = { version = "0.6.3", features = [ "runtime-actix-native-tls", "sqlite" ], optional = true }
+async-trait = "0.1.68"
+
+[features]
+default=["sqlite"]
+mongo = ["dep:mongodb"]
+sqlite = ["dep:sqlx"]
