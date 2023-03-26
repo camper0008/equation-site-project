@@ -95,7 +95,7 @@ fn levenshtein(a: &str, b: &str) -> usize {
     result
 }
 
-pub fn equations<T>(titles: T, query: String) -> Vec<PreviewableEquation>
+pub fn equations<T>(titles: T, query: &str) -> Vec<PreviewableEquation>
 where
     T: IntoIterator<Item = PreviewableEquation>,
 {
@@ -105,7 +105,7 @@ where
             id: eq.id,
             title: eq.title.clone(),
             date_created: eq.date_created,
-            lev_dist: levenshtein(&eq.title, &query),
+            lev_dist: levenshtein(&eq.title, query),
         })
         .collect();
 

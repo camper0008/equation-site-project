@@ -60,7 +60,7 @@ pub async fn edit(
         Err(db::Error::Duplicate) => bad_request_response("invalid title"),
         Err(db::Error::NotFound) => bad_request_response("invalid id"),
         Err(db::Error::OpenSSL) => unreachable!("should never return openssl error"),
-        Err(db::Error::Network) | Err(db::Error::Custom(_)) => {
+        Err(db::Error::Network | db::Error::Custom(_)) => {
             internal_server_error_response("db error")
         }
     }

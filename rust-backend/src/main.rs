@@ -19,7 +19,7 @@ use crate::routes::users;
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     if dotenv::dotenv().is_err() {
-        println!("unable to find .env file")
+        println!("unable to find .env file");
     };
 
     #[cfg(all(not(feature = "mongo"), not(feature = "sqlite")))]
@@ -47,12 +47,12 @@ async fn main() -> std::io::Result<()> {
 
     #[cfg(feature = "sqlite")]
     let db = {
-        use crate::database::sqlite::SqliteDriver;
+        use crate::database::sqlite::Driver;
         use std::env;
         let uri =
             env::var("DATABASE_URL").expect("unable to get DATABASE_URL environment variable");
         println!("Attempting to connect to sqlite...");
-        let db = SqliteDriver::new(uri.to_string()).await;
+        let db = Driver::new(uri.to_string()).await;
         println!("Sqlite connected");
         db
     };

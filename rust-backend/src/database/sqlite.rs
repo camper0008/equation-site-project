@@ -12,11 +12,11 @@ use crate::{
 
 use super::db::{Db, Error};
 
-pub struct SqliteDriver {
+pub struct Driver {
     pool: SqlitePool,
 }
 
-impl SqliteDriver {
+impl Driver {
     pub async fn new(db_url: String) -> Self {
         let pool = SqlitePool::connect(&db_url)
             .await
@@ -38,7 +38,7 @@ impl SqliteDriver {
 }
 
 #[async_trait]
-impl Db for SqliteDriver {
+impl Db for Driver {
     async fn add_user(&mut self, insertable_user: InsertableDbUser) -> Result<(), Error> {
         let id = gen_8_char_random_valid_string()?;
         let date = utc_date_iso_string();

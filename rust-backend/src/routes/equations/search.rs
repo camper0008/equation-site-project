@@ -19,7 +19,7 @@ pub async fn search(db: web::Data<DbParam>, title: web::Path<String>) -> impl Re
         return internal_server_error_response("db error");
     };
 
-    let equations = equations(titles, title.to_string());
+    let equations = equations(titles, &title);
 
     HttpResponse::Ok()
         .insert_header(ContentType::json())
