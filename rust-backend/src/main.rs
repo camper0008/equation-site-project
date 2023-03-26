@@ -75,7 +75,7 @@ async fn main() -> std::io::Result<()> {
             .service(equations::one::one)
             .service(equations::edit::edit)
     })
-    .bind(("127.0.0.1", 8080))?
+    .bind(("0.0.0.0", 8080))?
     .run()
     .await
 }
