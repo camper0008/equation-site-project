@@ -64,7 +64,8 @@ pub struct InsertableDbSession {
     pub user_id: String,
 }
 
-#[derive(Serialize, Deserialize, PartialEq, sqlx::Type)]
+#[derive(Serialize, Deserialize, PartialEq)]
+#[cfg_attr(feature = "sqlite", derive(sqlx::Type))]
 pub enum Permission {
     User,
     Contributor,

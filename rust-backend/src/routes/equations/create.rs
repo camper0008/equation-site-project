@@ -60,7 +60,6 @@ pub async fn create(
                 ok: true,
                 msg: "success",
             }),
-        Err(db::Error::Duplicate) => bad_request_response("invalid title"),
         Err(_) => internal_server_error_response("db error"),
     }
 }

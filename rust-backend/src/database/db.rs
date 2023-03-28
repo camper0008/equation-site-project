@@ -9,11 +9,9 @@ pub type DbParam = Mutex<dyn Db + Send + Sync>;
 
 #[derive(Debug)]
 pub enum Error {
-    Duplicate,
-    NotFound,
     OpenSSL,
+    NotFound,
     Network,
-    Custom(String),
 }
 
 impl From<openssl::error::ErrorStack> for Error {
@@ -27,7 +25,7 @@ impl From<mongodb::error::Error> for Error {
     fn from(err: mongodb::error::Error) -> Self {
         match *err.kind {
             mongodb::error::ErrorKind::InvalidArgument { .. } => Error::NotFound,
-            unmatched_err => Error::Custom(unmatched_err.to_string()),
+            _ => Error::Network,
         }
     }
 }

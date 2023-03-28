@@ -24,17 +24,6 @@ impl Driver {
 
         Self { pool }
     }
-
-    pub async fn title_is_taken(&self, id: &str, title: &str) -> Result<bool, Error> {
-        match sqlx::query!("SELECT id FROM equations WHERE title=?", title)
-            .fetch_optional(&self.pool)
-            .await
-        {
-            Ok(Some(other_id)) => Ok(other_id.id != id),
-            Ok(None) => Ok(false),
-            Err(_) => Err(Error::Network),
-        }
-    }
 }
 
 #[async_trait]
@@ -84,17 +73,6 @@ impl Db for Driver {
         &mut self,
         insertable_equation: InsertableDbEquation,
     ) -> Result<(), Error> {
-        let dupe = sqlx::query!(
-            "SELECT id FROM equations WHERE title=?",
-            insertable_equation.title
-        )
-        .fetch_optional(&self.pool)
-        .await
-        .map_err(|_| Error::Network)?;
-        if dupe.is_some() {
-            return Err(Error::Duplicate);
-        }
-
         let id = gen_8_char_random_valid_string()?;
         sqlx::query!(
             "INSERT INTO equations (id, title, content, creator_id) VALUES (?, ?, ?, ?);",
@@ -115,13 +93,6 @@ impl Db for Driver {
         insertable_equation: InsertableDbEquation,
         post_id: String,
     ) -> Result<(), Error> {
-        if self
-            .title_is_taken(&post_id, &insertable_equation.title)
-            .await?
-        {
-            return Err(Error::Duplicate);
-        };
-
         sqlx::query!(
             "UPDATE equations SET title=?, content=?, creator_id=? WHERE id=?;",
             insertable_equation.title,

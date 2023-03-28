@@ -38,7 +38,13 @@ pub async fn edit(
 
     let (Permission::Contributor | Permission::Root) = user.permission else {
         return bad_request_response("unauthorized");
+    };
 
+    match db.equation_from_title(body.title.clone()).await {
+        Ok(eq) if eq.id == post_id.to_string() => (),
+        Err(db::Error::NotFound) => (),
+        Ok(_) => return bad_request_response("invalid title"),
+        Err(_) => return internal_server_error_response(""),
     };
 
     let equation = InsertableDbEquation {
@@ -51,17 +57,14 @@ pub async fn edit(
         .update_equation_from_id(equation, post_id.to_string())
         .await
     {
-        Ok(_) => HttpResponse::Ok()
+        Ok(()) => HttpResponse::Ok()
             .insert_header(ContentType::json())
             .json(GenericResponse {
                 ok: true,
                 msg: "success",
             }),
-        Err(db::Error::Duplicate) => bad_request_response("invalid title"),
         Err(db::Error::NotFound) => bad_request_response("invalid id"),
         Err(db::Error::OpenSSL) => unreachable!("should never return openssl error"),
-        Err(db::Error::Network | db::Error::Custom(_)) => {
-            internal_server_error_response("db error")
-        }
+        Err(db::Error::Network) => internal_server_error_response("db error"),
     }
 }

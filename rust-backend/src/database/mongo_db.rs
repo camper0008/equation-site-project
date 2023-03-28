@@ -94,12 +94,6 @@ impl Db for MongoDb {
         let collection: Collection<DbUser> =
             self.client.database(&self.db_name).collection("users");
 
-        match self.user_from_name(insertable_user.username.clone()).await {
-            Err(Error::NotFound) => Ok(()),
-            Ok(_) => Err(Error::Duplicate),
-            err => err.map(|_| ()),
-        }?;
-
         let random_id = gen_8_char_random_valid_string()?;
 
         let user = DbUser {
@@ -125,7 +119,7 @@ impl Db for MongoDb {
         {
             Ok(Some(user)) => Ok(user),
             Ok(None) => Err(Error::NotFound),
-            Err(err) => Err(Error::Custom(err.to_string())),
+            Err(_) => Err(Error::Network),
         }
     }
 
@@ -135,15 +129,6 @@ impl Db for MongoDb {
     ) -> Result<(), Error> {
         let collection: Collection<DbEquation> =
             self.client.database(&self.db_name).collection("equations");
-
-        match self
-            .equation_from_title(insertable_equation.title.clone())
-            .await
-        {
-            Err(Error::NotFound) => Ok(()),
-            Ok(_) => Err(Error::Duplicate),
-            err => err.map(|_| ()),
-        }?;
 
         let random_id = gen_8_char_random_valid_string()?;
 
@@ -167,15 +152,6 @@ impl Db for MongoDb {
     ) -> Result<(), Error> {
         let collection: Collection<DbEquation> =
             self.client.database(&self.db_name).collection("equations");
-
-        match self
-            .equation_from_title(insertable_equation.title.clone())
-            .await
-        {
-            Ok(DbEquation { id, .. }) if id == post_id => Ok(()),
-            Ok(_) => Err(Error::Duplicate),
-            err => err.map(|_| ()),
-        }?;
 
         self.equation_from_id(post_id.clone()).await?;
 
@@ -201,21 +177,20 @@ impl Db for MongoDb {
         let collection: Collection<DbEquation> =
             self.client.database(&self.db_name).collection("equations");
 
-        match collection.find_one(doc! { "id": id }, None).await {
-            Ok(Some(equation)) => Ok(equation),
-            Ok(None) => Err(Error::NotFound),
-            Err(err) => Err(Error::from(err)),
-        }
+        collection
+            .find_one(doc! { "id": id }, None)
+            .await?
+            .ok_or(Error::NotFound)
     }
 
     async fn equation_from_title(&self, title: String) -> Result<DbEquation, Error> {
         let collection: Collection<DbEquation> =
             self.client.database(&self.db_name).collection("equations");
-        match collection.find_one(doc! { "title": title }, None).await {
-            Ok(Some(equation)) => Ok(equation),
-            Ok(None) => Err(Error::NotFound),
-            Err(err) => Err(Error::from(err)),
-        }
+
+        collection
+            .find_one(doc! { "title": title }, None)
+            .await?
+            .ok_or(Error::NotFound)
     }
 
     async fn all_titles(&self) -> Result<Vec<PreviewableEquation>, Error> {
@@ -228,11 +203,10 @@ impl Db for MongoDb {
                     .projection(doc! {"id": 1u32, "title": 1u32, "date_created": 1u32})
                     .build(),
             )
-            .await
-            .map_err(|e| Error::Custom(format!("title recieving error, {e}")))?
+            .await?
             .try_collect()
             .await
-            .map_err(|_| Error::Custom("title collection error".to_string()))
+            .map_err(Error::from)
     }
 
     async fn add_session(&mut self, insertable_session: InsertableDbSession) -> Result<(), Error> {
@@ -245,45 +219,36 @@ impl Db for MongoDb {
             date_created: utc_date_iso_string(),
         };
 
-        let result = collection.insert_one(session, None).await;
-        match result {
-            Ok(_) => Ok(()),
-            Err(err) => Err(Error::from(err)),
-        }
+        collection.insert_one(session, None).await?;
+
+        Ok(())
     }
 
     async fn session_user_from_token(&mut self, token: SessionToken) -> Result<DbUser, Error> {
         let session_collection: Collection<DbSession> =
             self.client.database(&self.db_name).collection("sessions");
-        let session = match session_collection
+        let session = session_collection
             .find_one(doc! { "token": token }, None)
-            .await
-        {
-            Ok(Some(session)) => Ok(session),
-            Ok(None) => Err(Error::NotFound),
-            Err(err) => Err(Error::Custom(err.to_string())),
-        }?;
+            .await?
+            .ok_or(Error::Network)?;
 
         let user_collection: Collection<DbUser> =
             self.client.database(&self.db_name).collection("users");
 
-        match user_collection
+        user_collection
             .find_one(doc! { "id": session.user_id }, None)
-            .await
-        {
-            Ok(Some(user)) => Ok(user),
-            Ok(None) => Err(Error::NotFound),
-            Err(err) => Err(Error::from(err)),
-        }
+            .await?
+            .ok_or(Error::NotFound)
     }
 
     async fn delete_user_session(&mut self, token: SessionToken) -> Result<(), Error> {
         let collection: Collection<DbSession> =
             self.client.database(&self.db_name).collection("sessions");
-        match collection.delete_one(doc! { "token": token }, None).await {
-            Ok(Some(session)) => Ok(()),
-            Ok(None) => Err(Error::NotFound),
-            Err(err) => Err(Error::from(err)),
-        }
+        collection
+            .find_one_and_delete(doc! { "token": token }, None)
+            .await?
+            .ok_or(Error::NotFound)?;
+
+        Ok(())
     }
 }
